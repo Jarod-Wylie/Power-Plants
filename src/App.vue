@@ -1,28 +1,64 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-stage :config="configKonva">
+    <v-layer>
+      
+      <!-- <v-rect :config="square" v-for="i in tileArray" :key="i"></v-rect> -->
+
+
+      <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile>
+    </v-layer>
+  </v-stage>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Tile from './Tile.vue'
+// import HelloWorld from HelloWorld.vue;
 
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+  components:{
+    'Tile': Tile,
+  },
+  data() {
+    return {
+      tileArray: [],
+      tileObj: {x: 100, y: 100, tileID: 0},
+      configKonva: {
+        width: 1000,
+        height: 1000
+      },
+      square: {
+        x: 100,
+        y: 100,
+        height: 20,
+        width: 20,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1
+      }
+    };
+  },
+  mounted(){
+    this.generateGrid();
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+  },
+
+  methods:{
+    generateGrid(){
+      var i = 20
+      var j = 20
+      var ySpace = 100
+
+      for(j = 20; j > 0 ; j--){
+      var xSpace = 100
+
+      for(i = 20; i > 0; i--){
+        this.tileArray.push({x:xSpace,y: ySpace, tileID: i, show:"."});
+        xSpace += 20;
+      }
+        ySpace += 20;
+      }
+    }
+  }
+};
+
+</script>
