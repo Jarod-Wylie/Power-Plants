@@ -1,4 +1,6 @@
 <template>
+<div>
+<!-- <input @keyup.enter="log()"/> -->
   <v-stage :config="configKonva">
 
     <v-layer>
@@ -13,27 +15,41 @@
         }"
         v-for="i in tileArray" :key="i.tileID"></v-rect>
 
+      <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
+      <!-- <BoundaryTile></BoundaryTile> -->
 
-      <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
-      <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
-      <Player></Player>
+      <Player 
+        @plantHere="plant"
+        @harvestHere="harvest"></Player>
+
+      <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
+
     </v-layer>
   </v-stage>
+  </div>
 </template>
 
 <script>
 import Tile from './Tile.vue'
 import Player from './Player.vue'
-// import HelloWorld from HelloWorld.vue;
+import BoundaryTile from './BoundaryTile.vue'
+import PlantTile from './PlantTile.vue'
+import { log } from 'util';
+
 
 export default {
   components:{
     'Tile': Tile,
     'Player': Player,
+    'BoundaryTile': BoundaryTile,
+    'PlantTile': PlantTile,
   },
   data() {
     return {
       tileArray: [],
+      plantArray: [],
+      inventoryArray: [],
+
       tileObj: {x: 100, y: 100, tileID: 0},
       configKonva: {
         width: 1000,
@@ -73,6 +89,26 @@ export default {
       }
         ySpace += 20;
       }
+    },
+
+    plant(obj){
+      console.log("Planted");
+
+      this.plantArray.push(obj);
+
+      console.log("plant Array:", this.plantArray);
+    },
+    harvest(obj){
+
+      var newItem= this.plantArray.find(plant => plant.id == 0);
+      this.plantArray = this.plantArray.filter(plant => plant.id != 0);
+
+      this.inventoryArray.push(newItem);
+
+      console.log("Invetory:", this.inventoryArray);
+      console.log("PlantArray:", this.plantArray);
+      
+
     },
 
   log(){

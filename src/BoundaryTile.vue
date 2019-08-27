@@ -1,23 +1,22 @@
-<!-- The foundation to other tiles -->
+<!-- Meant to close the playing area bounds. This tile is not developed yet -->
 
 <template>
   <div>
-    <!-- <v-rect :config="square"></v-rect> -->
-    <!-- <v-text :config="symbol"/> -->
+    <v-rect></v-rect>
   </div>
 </template>
 
 <script>
 export default {
-  name: "Tile",
+  name: "BoundaryTile",
   props: {
     Coordinates: Object
   },
   data() {
     return {
-      square: {
-        x: this.Coordinates.x,
-        y: this.Coordinates.y,
+      tile: {
+        x: 80,
+        y: 80,
         height: 20,
         width: 20,
         fill: "black",
@@ -28,7 +27,7 @@ export default {
   },
 
   mounted() {
-    console.log("Tile Mounted");
+    console.log("BoundaryTile Mounted");
   }
 };
 </script>

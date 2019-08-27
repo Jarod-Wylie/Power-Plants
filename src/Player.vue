@@ -1,10 +1,17 @@
 <template>
   <div>    
 
+<!-- Actions players can take -->
+
+    <!-- Directions -->
     <v-text @click="moveUp()" :config="Up"/>
     <v-text @click="moveDown()" :config="Down"/>
     <v-text @click="moveRight()" :config="Right"/>
     <v-text @click="moveLeft()" :config="Left"/>
+
+    <!-- Farming Actions -->
+    <v-text @click="plant()" :config="Plant"/>
+    <v-text @click="harvest()" :config="Harvest"/>
 
     <v-text :config="symbol"/>
     <!-- <button @click="moveDown()">LOg</button> -->
@@ -20,11 +27,14 @@ export default {
   data() {
     return {
 
+        plantID: 0,
+
       symbol: {
         x: 102,
         y: 102,
         fontSize: 15,
         text: "@",
+        fill: 'red',
       },
       Up: {
         x: 800,
@@ -50,13 +60,29 @@ export default {
         fontSize: 15,
         text: "Left",
       },
+
+      Plant: {
+        x: 800,
+        y: 450,
+        fontSize: 15,
+        text: "Plant",
+        color: "green",
+      },
+      Harvest: {
+        x: 800,
+        y: 550,
+        fontSize: 15,
+        text: "Harvest",
+        color: "green",
+      },
+
     }
   },
 
 methods:{
           
             moveUp(){
-                console.log("Player moved South");
+                console.log("Player moved North");
                 this.symbol.y -= 20;
           },
             moveDown(){
@@ -64,12 +90,30 @@ methods:{
                 this.symbol.y += 20;
           },
             moveRight(){
-                console.log("Player moved South");
+                console.log("Player moved East");
                 this.symbol.x += 20;
           },
             moveLeft(){
-                console.log("Player moved South");
+                console.log("Player moved West");
                 this.symbol.x -= 20;
+          },
+
+        // Horticulture methods
+          plant(){
+
+              console.log("Player is planting.....")
+
+              this.$emit("plantHere", { 
+                        id:  this.plantID,
+                        x: this.symbol.x,
+                        y: this.symbol.y,
+                        });
+            this.plantID++;
+          },
+          harvest(){
+              this.$emit("harvestHere")
+              console.log("Harvesting....");
+              
           }
       }
 
