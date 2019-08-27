@@ -1,5 +1,5 @@
 <template>
-  <div>    
+  <div>   
 
 <!-- Actions players can take -->
 
@@ -22,7 +22,7 @@
 export default {
   name: "Player",
   props: {
-    Coordinates: Object
+    plantArray: Array,
   },
   data() {
     return {
@@ -84,6 +84,7 @@ methods:{
             moveUp(){
                 console.log("Player moved North");
                 this.symbol.y -= 20;
+                console.log("Plants player know about:", this.plantArray);
           },
             moveDown(){
                 console.log("Player moved South");
@@ -109,11 +110,16 @@ methods:{
                         y: this.symbol.y,
                         });
             this.plantID++;
+
           },
           harvest(){
-              this.$emit("harvestHere")
+              var plantToHarvest = this.plantArray.find(plant => (plant.x == this.symbol.x) && (plant.y == this.symbol.y) )
+              console.log("The plant to harvest", plantToHarvest);
+              
+              this.$emit("harvestHere", plantToHarvest)
               console.log("Harvesting....");
               
+
           }
       }
 
