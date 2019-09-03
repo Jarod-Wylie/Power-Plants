@@ -57,12 +57,24 @@ export default {
       switch(this.count){
         case 10:
           this.maturity = "seedling";
+          this.plant.stroke = "green";
+          console.log("seedling count:", this.count);
+          break;
+          
         case 20:
           this.maturity = "mature";
-        case 30:
+          this.plant.fontSize = 30;
+          break;
+        case 25:
           this.maturity = "ideal";
-        case 40:
+          this.plant.stroke = "yellow"
+          break;
+        case 29:
           this.maturity = "dead";
+          this.plant.stroke = "black";
+          this.plant.fontSize = 10;
+          this.plant.text = "X";
+          break;
       }
 
       console.log("maturity:", this.maturity);
