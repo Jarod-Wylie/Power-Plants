@@ -1,9 +1,28 @@
 <template>
-  <div>
-    <div>{{food}}</div>
-    <!-- <input @keyup.enter="log()"/> -->
-    <v-stage :config="configKonva">
+
+    <v-stage ref="stage" :config="configKonva">
       <v-layer>
+
+        <v-rect
+          tabindex="0"
+          ref="test"
+          :config="{
+          x: 500,
+          y: 400,
+          width: 20,
+          height: 20,
+          fill: 'yellow',
+          stroke: '#8EA8C3'
+        }"/>
+
+
+        <v-text 
+        :config="{
+          x: 800,
+          y: 50,
+          fontSize:25,
+          text:'Harvest 6 ideal plants(yellow) to survive the winter.',
+          }"/>
         <v-text 
         :config="{
           x: 800,
@@ -27,12 +46,13 @@
         <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
         <!-- <BoundaryTile></BoundaryTile> -->
 
-        <Player @plantHere="plant" @harvestHere="harvest" :plantArray="plantArray"></Player>
+        <Player @plantHere="plant" @harvestHere="harvest" :plantArray="plantArray" :boundaries="boundariesArray"></Player>
 
+        <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
         <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
       </v-layer>
     </v-stage>
-  </div>
+
 </template>
 
 <script>
@@ -40,6 +60,8 @@ import Tile from "./Tile.vue";
 import Player from "./Player.vue";
 import BoundaryTile from "./BoundaryTile.vue";
 import PlantTile from "./PlantTile.vue";
+import waterTile from "./waterTile.vue";
+
 import { log } from "util";
 
 export default {
@@ -47,13 +69,16 @@ export default {
     Tile: Tile,
     Player: Player,
     BoundaryTile: BoundaryTile,
-    PlantTile: PlantTile
+    PlantTile: PlantTile,
+    waterTile: waterTile,
   },
   data() {
     return {
       tileArray: [],
       plantArray: [],
       inventoryArray: [],
+      boundariesArray: [],
+      waterArray: [{ x: 100, y: 80, tileID: "water"}],
 
       food: 0,
       amount: "0/6",
@@ -67,8 +92,8 @@ export default {
 
       tileObj: { x: 100, y: 100, tileID: 0 },
       configKonva: {
-        width: 1000,
-        height: 1000
+        width: 2000,
+        height: 2000,
       }
       // square: {
       //   x: 100,
@@ -83,7 +108,9 @@ export default {
   },
   mounted() {
     this.generateGrid();
+    this.generateWater();
   },
+
 
   methods: {
     generateGrid() {
@@ -97,6 +124,25 @@ export default {
 
         for (i = 20; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: id, show: "O" });
+          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
+          xSpace += 20;
+          id++;
+        }
+        ySpace += 20;
+      }
+    },
+    generateWater() {
+      var id = 0;
+      var i = 20;
+      var j = 20;
+      var ySpace = 100;
+
+      for (j = 5; j > 0; j--) {
+        var xSpace = 100;
+
+        for (i = 5; i > 0; i--) {
+          this.waterArray.push({ x: xSpace, y: ySpace, tileID: "waterTile#:" + id });
+          // this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
           xSpace += 20;
           id++;
         }
@@ -104,6 +150,7 @@ export default {
       }
     },
 
+    // Initiated when player emits plantHere
     plant(obj) {
       console.log("Planted");
 
@@ -111,8 +158,12 @@ export default {
 
       console.log("plant Array:", this.plantArray);
     },
+
+    // Initiated when player emits harvestHere
     harvest(obj) {
+      console.log("obj", obj);
       var newItem = this.plantArray.find(plant => plant.id == obj.id);
+      console.log("newitem:", newItem)
       this.plantArray = this.plantArray.filter(plant => plant.id != obj.id);
 
       this.inventoryArray.push(newItem);
@@ -120,11 +171,17 @@ export default {
       console.log("Invetory:", this.inventoryArray);
       console.log("PlantArray:", this.plantArray);
 
+      // A test to see if you can re-assign the x postion of the first plant in the array to a new x position: you
+      // can not - child seems to never get passed the new coordinate
+      this.plantArray[0].x = 290;
+
       if (this.inventoryArray.length == 6) {
         alert("You have gathered enough for the winter.");
       }
 
       this.food++;
+      // forceUpdate has no purpose - was hoping to force vue to re-render components and pass changes to attrs to children
+      this.$forceUpdate();
     },
 
     log() {

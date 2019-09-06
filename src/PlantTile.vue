@@ -74,12 +74,14 @@ export default {
           this.plant.stroke = "black";
           this.plant.fontSize = 10;
           this.plant.text = "X";
+          clearInterval(this.interval);
           break;
       }
+      console.log("my coords", this.plant.x, "__", this.plant.y)
 
-      console.log("maturity:", this.maturity);
-      console.log("interval:", this.count);
-      // clearInterval(this.interval);
+      // console.log("maturity:", this.maturity);
+      // console.log("interval:", this.count);
+      
     }
   }
 };
