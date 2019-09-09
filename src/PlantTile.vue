@@ -41,6 +41,10 @@ export default {
     console.log("maturity:", this.maturity);
 
     this.interval = setInterval(() => {
+      this.plant.x = this.plantInfo.x;
+      this.plant.y = this.plantInfo.y;
+      this.square.x = this.plantInfo.x;
+      this.square.y = this.plantInfo.y;
       this.growPlant();
     }, 1000);
 

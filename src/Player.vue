@@ -1,5 +1,12 @@
 <template>
   <div>
+
+    <!-- Player Location -->
+    <v-text :config="PlayerLog" />
+
+    <!-- Player Energy bar -->
+    <v-text :config="energy" />
+
     <!-- Actions players can take -->
 
 
@@ -7,7 +14,7 @@
     <v-text @click="moveUp()" :config="Up" />
     <v-text @click="moveDown()" :config="Down" />
     <v-text @click="moveRight()" :config="Right" />
-    <v-text @keyup.left="moveLeft()" v-focus @click="moveLeft()" :config="Left" />
+    <v-text @keyup.left="moveLeft()"  @click="moveLeft()" :config="Left" />
 
 
     <!-- Farming Actions -->
@@ -32,8 +39,8 @@ export default {
       margin: 20,
 
       player: {
-        x: 200,
-        y: 140,
+        x: 500,
+        y: 400,
         fontSize: 15,
         text: "@",
         fill: "red"
@@ -43,6 +50,13 @@ export default {
         y: 40,
         fontSize: 30,
         text: "cao",
+      },
+      energy: {
+        x: 200,
+        y: 550,
+        fontSize: 30,
+        text:'/////////////////',
+        stroke: 'green',
       },
       Up: {
         x: 800,
@@ -95,6 +109,7 @@ export default {
   methods: {
     moveUp() {
       console.log("Player moved North");
+        this.subtractEnergy();
          this.player.y -= 20;
              this.PlayerLog.text = 'x:' + this.player.x + ' y:' + this.player.y;
 
@@ -140,6 +155,7 @@ export default {
     },
     moveDown() {
       console.log("Player moved South");
+      this.subtractEnergy();
       this.player.y += 20;
           this.PlayerLog.text = 'x:' + this.player.x + ' y:' + this.player.y;
 
@@ -180,11 +196,13 @@ export default {
     },
     moveRight() {
       console.log("Player moved East");
+      this.subtractEnergy();
       this.player.x += 20;
           this.PlayerLog.text = 'x:' + this.player.x + ' y:' + this.player.y;
     },
     moveLeft() {
       console.log("Player moved West");
+      this.subtractEnergy();
       this.player.x -= 20;
           this.PlayerLog.text = 'x:' + this.player.x + ' y:' + this.player.y;
       console.log(
@@ -194,6 +212,27 @@ export default {
         "Y:",
         this.player.y
       );
+    },
+
+    // Player Status Functions
+
+    subtractEnergy(){
+      var str = this.energy.text;
+      this.energy.text = str.substring(0, str.length - 1);
+
+      if(str.length < str.length/2){
+        this.energy.stroke = 'yellow';
+      }
+      
+      if((this.player.x == 500)&&(this.player.y == 400)){
+      this.energy.text = "//////////////"
+      }
+
+
+      if(str.length == 0){
+        alert("Players has died of fatigue")
+      }
+
     },
 
     // Horticulture methods

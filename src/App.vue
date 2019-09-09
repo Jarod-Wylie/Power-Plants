@@ -173,7 +173,7 @@ export default {
 
       // A test to see if you can re-assign the x postion of the first plant in the array to a new x position: you
       // can not - child seems to never get passed the new coordinate
-      this.plantArray[0].x = 290;
+      // this.plantArray[0].x = 290;
 
       if (this.inventoryArray.length == 6) {
         alert("You have gathered enough for the winter.");
