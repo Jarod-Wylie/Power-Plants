@@ -246,22 +246,15 @@ export default {
       });
       this.plantID++;
     },
-    harvest() {
+     harvest() {
       if(this.plantArray.find(plant => plant.x === this.player.x && plant.y === this.player.y))
         {
         var plantToHarvest = this.plantArray.find(
           plant => plant.x === this.player.x && plant.y === this.player.y
         );
-        // var plantToHarvest = {
-        //   x:this.player.x,
-        //   y:this.player.y
-
-        // }
         console.log("The plant to harvest", plantToHarvest);
-
         this.$emit("harvestHere", plantToHarvest);
         console.log("Harvesting....");
-
       }
       else{console.log("nothing to harvest")
         console.log("plantArray", this.plantArray)}
