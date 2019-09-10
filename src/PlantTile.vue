@@ -41,10 +41,10 @@ export default {
     console.log("maturity:", this.maturity);
 
     this.interval = setInterval(() => {
-      this.plant.x = this.plantInfo.x;
-      this.plant.y = this.plantInfo.y;
-      this.square.x = this.plantInfo.x;
-      this.square.y = this.plantInfo.y;
+      // this.plant.x = this.plantInfo.x;
+      // this.plant.y = this.plantInfo.y;
+      // this.square.x = this.plantInfo.x;
+      // this.square.y = this.plantInfo.y;
       this.growPlant();
     }, 1000);
 
@@ -62,7 +62,7 @@ export default {
         case 10:
           this.maturity = "seedling";
           this.plant.stroke = "green";
-          console.log("seedling count:", this.count);
+          // console.log("seedling count:", this.count);
           break;
           
         case 20:
@@ -81,7 +81,7 @@ export default {
           clearInterval(this.interval);
           break;
       }
-      console.log("my coords", this.plant.x, "__", this.plant.y)
+      // console.log("my coords", this.plant.x, "__", this.plant.y)
 
       // console.log("maturity:", this.maturity);
       // console.log("interval:", this.count);

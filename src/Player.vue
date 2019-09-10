@@ -229,9 +229,9 @@ export default {
       }
 
 
-      if(str.length == 0){
-        alert("Players has died of fatigue")
-      }
+      // if(str.length == 0){
+      //   alert("Players has died of fatigue")
+      // }
 
     },
 
@@ -252,6 +252,11 @@ export default {
         var plantToHarvest = this.plantArray.find(
           plant => plant.x === this.player.x && plant.y === this.player.y
         );
+        // var plantToHarvest = {
+        //   x:this.player.x,
+        //   y:this.player.y
+
+        // }
         console.log("The plant to harvest", plantToHarvest);
 
         this.$emit("harvestHere", plantToHarvest);

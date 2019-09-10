@@ -152,7 +152,8 @@ export default {
 
     // Initiated when player emits plantHere
     plant(obj) {
-      console.log("Planted");
+      console.log("Planted",obj);
+      
 
       this.plantArray.push(obj);
 
@@ -161,12 +162,43 @@ export default {
 
     // Initiated when player emits harvestHere
     harvest(obj) {
-      console.log("obj", obj);
-      var newItem = this.plantArray.find(plant => plant.id == obj.id);
-      console.log("newitem:", newItem)
-      this.plantArray = this.plantArray.filter(plant => plant.id != obj.id);
+      // console.log("obj", obj);
+        console.log("before find:", this.plantArray)
+      // var newItem = this.plantArray.find(plant => {
+      //   console.log('plant.id',plant.id);
+      //   console.log('obj.id',obj.id);
+      //   if (plant.id == obj.id){
+      //     return plant;
+      //   }
+      // } 
+      // );
+      // console.log("newitem:", newItem)
+      console.log("after find:", this.plantArray)
 
-      this.inventoryArray.push(newItem);
+      this.plantArray = this.plantArray.filter(function (plant){
+        if ((plant.x == obj.x) && (plant.y == obj.y)){
+
+          return plant;
+        }
+      });
+
+      //   console.log('before for', this.plantArray.length);
+      // for(var i = 0; i<this.plantArray.length;i++){
+      //   console.log('in for')
+      //   if (
+      //     (this.plantArray[i].x === obj.x) && 
+      //     (this.plantArray[i].y === obj.y)
+      //     ){
+      //       console.log('in if', this.plantArray[i].x )
+      //       console.log('in if', obj.x )
+      //       console.log('in if', this.plantArray[i].y )
+      //       console.log('in if', obj.y )
+      //     this.plantArray = this.plantArray.slice(i);
+      //     break;
+      //   }
+      // }
+
+      // this.inventoryArray.push(newItem);
 
       console.log("Invetory:", this.inventoryArray);
       console.log("PlantArray:", this.plantArray);
