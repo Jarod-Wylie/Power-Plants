@@ -1,61 +1,60 @@
 <template>
   <v-stage ref="stage" :config="configKonva">
-    <v-layer>
-      <v-rect
-        tabindex="0"
-        ref="test"
-        :config="{
-          x: 500,
-          y: 400,
-          width: 20,
-          height: 20,
-          fill: 'yellow',
-          stroke: '#8EA8C3'
-        }"
-      />
-
-      <v-text
-        :config="{
-          x: 800,
-          y: 50,
-          fontSize:25,
-          text:'Harvest 6 ideal plants(yellow) to survive the winter.',
+      <v-layer>
+        <v-rect
+          :config="{
+            width: 2000,
+            height: 2000,
+            fill: '#8EA8C3',
+            stroke: '#8EA8C3'
           }"
-      />
-      <v-text
-        :config="{
-          x: 800,
-          y: 100,
-          fontSize:25,
-          text: food + '/6',
+        ></v-rect>
+
+        <v-text
+          :config="{
+            x: 800,
+            y: 50,
+            fontSize:25,
+            text:'Harvest 6 ideal plants(yellow) to survive the winter.',
+            }"
+        />
+        <v-text
+          :config="{
+            x: 800,
+            y: 100,
+            fontSize:25,
+            text: food + '/6',
+            }"
+        />
+        <v-rect
+          :config="{
+            x: i.x,
+            y: i.y,
+            width: 20,
+            height: 20,
+            fill: 'white',
+            stroke: '#8EA8C3'
           }"
-      />
-      <v-rect
-        :config="{
-          x: i.x,
-          y: i.y,
-          width: 20,
-          height: 20,
-          fill: 'white',
-          stroke: '#8EA8C3'
-        }"
-        v-for="i in tileArray"
-        :key="i.tileID"
-      ></v-rect>
+          v-for="i in tileArray"
+          :key="i.tileID"
+        ></v-rect>
 
-      <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
-      <!-- <BoundaryTile></BoundaryTile> -->
+        <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
+        <!-- <BoundaryTile></BoundaryTile> -->
 
-      <Player
-        @plantHere="plant"
-        @harvestHere="harvest"
-        :plantArray="plantArray"
-        :boundaries="boundariesArray"
-      ></Player>
+        <Player
+          @plantHere="plant"
+          @harvestHere="harvest"
+          :plantArray="plantArray"
+          :boundaries="boundariesArray"
+          :HomeInfo="HomeArray[0]"
+        ></Player>
 
-      <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
-      <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
-    </v-layer>
+        <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
+
+        <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
+        <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
+      </v-layer>
   </v-stage>
 </template>
 
@@ -65,6 +64,7 @@ import Player from "./Player.vue";
 import BoundaryTile from "./BoundaryTile.vue";
 import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
+import HomeTile from "./HomeTile.vue";
 
 import { log } from "util";
 
@@ -72,6 +72,7 @@ export default {
   components: {
     Tile: Tile,
     Player: Player,
+    HomeTile: HomeTile,
     BoundaryTile: BoundaryTile,
     PlantTile: PlantTile,
     waterTile: waterTile
@@ -82,6 +83,7 @@ export default {
       plantArray: [],
       inventoryArray: [],
       boundariesArray: [],
+      HomeArray: [{x:480, y:440}],
       waterArray: [{ x: 100, y: 80, tileID: "water" }],
 
       food: 0,
@@ -97,7 +99,8 @@ export default {
       tileObj: { x: 100, y: 100, tileID: 0 },
       configKonva: {
         width: 2000,
-        height: 2000
+        height: 2000,
+        color: "blue"
       }
       // square: {
       //   x: 100,
