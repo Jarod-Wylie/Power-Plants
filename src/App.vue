@@ -32,7 +32,7 @@
             y: i.y,
             width: 20,
             height: 20,
-            fill: 'white',
+            fill: '#8C847F',
             stroke: '#8EA8C3'
           }"
           v-for="i in tileArray"
@@ -130,11 +130,11 @@ export default {
 
         for (i = 20; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: id, show: "O" });
-          this.boundariesArray.push({
-            x: xSpace,
-            y: ySpace,
-            tileID: "boarder#:" + id
-          });
+          // this.boundariesArray.push({
+          //   x: xSpace,
+          //   y: ySpace,
+          //   tileID: "boarder#:" + id
+          // });
           xSpace += 20;
           id++;
         }
@@ -145,10 +145,10 @@ export default {
       var id = 0;
       var i = 20;
       var j = 20;
-      var ySpace = 100;
+      var ySpace = 240;
 
       for (j = 5; j > 0; j--) {
-        var xSpace = 100;
+        var xSpace = 260;
 
         for (i = 5; i > 0; i--) {
           this.waterArray.push({
@@ -156,7 +156,7 @@ export default {
             y: ySpace,
             tileID: "waterTile#:" + id
           });
-          // this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
+          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
           xSpace += 20;
           id++;
         }

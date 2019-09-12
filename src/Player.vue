@@ -103,10 +103,17 @@ export default {
   methods: {
     moveUp() {
       if (this.player.y != 100) {
-        console.log("Player moved North");
-        this.subtractEnergy();
-        this.player.y -= 20;
-        this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        var boundaryFound = this.boundaries.find(
+          boundaries =>
+            boundaries.x == this.player.x && boundaries.y + 20 == this.player.y
+        );
+        if (!boundaryFound) {
+          console.log("Player moved North");
+          console.log("Boundaries Array", this.boundaries);
+          this.subtractEnergy();
+          this.player.y -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        }
       }
 
       // if   ( ( 100 == (this.player.x - 2 )) && (100 !== (this.player.y -2 )) ){
@@ -151,10 +158,14 @@ export default {
     },
     moveDown() {
       if (this.player.y != 480) {
+        var boundaryFound = this.boundaries.find(
+            boundaries  => boundaries.x == this.player.x && boundaries.y -20 == this.player.y )
+          if (!boundaryFound){
         console.log("Player moved South");
         this.subtractEnergy();
         this.player.y += 20;
         this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+      }
       }
 
       // if (
@@ -194,18 +205,28 @@ export default {
     },
     moveRight() {
       if (this.player.x != 480) {
+        var boundaryFound = this.boundaries.find(
+            boundaries  => boundaries.x - 20 == this.player.x && boundaries.y +20 == this.player.y )
+          if (!boundaryFound){
         console.log("Player moved East");
         this.subtractEnergy();
         this.player.x += 20;
         this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
       }
+      }
     },
     moveLeft() {
       if (this.player.x != 100) {
-        console.log("Player moved West");
-        this.subtractEnergy();
-        this.player.x -= 20;
-        this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        var boundaryFound = this.boundaries.find(
+          boundaries =>
+            boundaries.x + 20 == this.player.x && boundaries.y == this.player.y
+        );
+        if (!boundaryFound) {
+          console.log("Player moved West");
+          this.subtractEnergy();
+          this.player.x -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        }
       }
       console.log(
         "playerCoordinates",
