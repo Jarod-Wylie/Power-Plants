@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <v-rect></v-rect>
+    <v-rect :config="tile"></v-rect>
   </div>
 </template>
 
@@ -10,16 +10,16 @@
 export default {
   name: "BoundaryTile",
   props: {
-    Coordinates: Object
+    wallInfo: Object
   },
   data() {
     return {
       tile: {
-        x: 80,
-        y: 80,
+        x: this.wallInfo.x,
+        y: this.wallInfo.y,
         height: 20,
         width: 20,
-        fill: "black",
+        fill: "grey",
         stroke: "black",
         strokeWidth: 1,
       },

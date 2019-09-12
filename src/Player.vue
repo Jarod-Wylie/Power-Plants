@@ -9,13 +9,20 @@
     <!-- Actions players can take -->
 
     <!-- Directions -->
+    <v-rect @click="moveUp()" :config="upButton"/>
     <v-text @click="moveUp()" :config="Up" />
+
+    <v-rect @click="moveDown()" :config="downButton"/>
     <v-text @click="moveDown()" :config="Down" />
+
+    <v-rect @click="moveRight()" :config="rightButton"/>
     <v-text @click="moveRight()" :config="Right" />
+
+    <v-rect @click="moveLeft()" :config="leftButton"/>
     <v-text @keyup.left="moveLeft()" @click="moveLeft()" :config="Left" />
 
     <!-- Farming Actions -->
-    <v-text @click="plant()" :config="Plant" />
+    <v-circle @click="plant()" :config="Plant" />
     <v-text @click="harvest()" :config="Harvest" />
 
     <v-text :config="player" />
@@ -54,37 +61,73 @@ export default {
         text: "/////////////////",
         stroke: "green"
       },
+      upButton:{
+        x:780,
+        y:390,
+        width:60,
+        height:40,
+        fill: "#CCDDE2",
+        stroke: "black",
+      },
       Up: {
         x: 800,
         y: 400,
         fontSize: 15,
-        text: "Up"
+        text: ""
+      },
+
+      downButton:{
+        x:780,
+        y:500,
+        width:60,
+        height:40,
+        fill: "#CCDDE2",
+        stroke: "black",
       },
       Down: {
         x: 800,
         y: 500,
         fontSize: 15,
-        text: "Down"
+        text: ""
+      },
+
+      rightButton:{
+        x:865,
+        y:450,
+        width:60,
+        height:40,
+        fill: "#CCDDE2",
+        stroke: "black",
       },
       Right: {
         x: 900,
         y: 450,
-        fontSize: 15,
-        text: "Right"
+        text: ""
+      },
+
+      leftButton:{
+        x:700,
+        y:450,
+        width:60,
+        height:40,
+        fill: "#CCDDE2",
+        stroke: "black",
       },
       Left: {
         x: 700,
         y: 450,
         fontSize: 15,
-        text: "Left"
+        text: ""
       },
 
       Plant: {
-        x: 800,
-        y: 450,
-        fontSize: 15,
+        x: 810,
+        y: 460,
+        radius: 25,
+        fill: 'green',
+        stroke:'black',
         text: "Plant",
-        color: "green"
+
       },
       Harvest: {
         x: 800,
@@ -102,6 +145,7 @@ export default {
 
   methods: {
     moveUp() {
+      
       if (this.player.y != 100) {
         var boundaryFound = this.boundaries.find(
           boundaries =>
@@ -115,46 +159,6 @@ export default {
           this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
-
-      // if   ( ( 100 == (this.player.x - 2 )) && (100 !== (this.player.y -2 )) ){
-      //   this.player.y -= 20;
-      //   console.log("playerCoordinates", "X:",this.player.x, "Y:", this.player.y)
-      // }
-
-      // if (
-      //   this.boundaries.find(
-      //     coordinate =>
-      //       coordinate.y == this.player.y + 18 &&
-      //       coordinate.x == this.player.x - 2
-      //   )
-      // ) {
-      //   var cow = this.boundaries.find(
-      //     coordinate =>
-      //       coordinate.y + this.margin == this.player.y - 2 &&
-      //       coordinate.x == this.player.x - 2
-      //   );
-      //   console.log("cow:", cow);
-
-      //   this.player.y -= 20;
-      //   console.log(
-      //     "playerCoordinates",
-      //     "X: ",
-      //     this.player.x,
-      //     "Y:",
-      //     this.player.y
-      //   );
-      // } else {
-      //   console.log("You can not cross a body of water.");
-      //   // console.log("Boundary:", this.boundaries[]);
-      //   this.player.y += 20;
-      //   console.log(
-      //     "playerCoordinates",
-      //     "X: ",
-      //     this.player.x,
-      //     "Y:",
-      //     this.player.y
-      //   );
-      // }
     },
     moveDown() {
       if (this.player.y != 480) {
@@ -167,46 +171,11 @@ export default {
         this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
       }
       }
-
-      // if (
-      //   this.boundaries.find(
-      //     coordinate =>
-      //       coordinate.y == this.player.y - 22 &&
-      //       coordinate.x == this.player.x - 2
-      //   )
-      // ) {
-      //   var cow = this.boundaries.find(
-      //     coordinate =>
-      //       coordinate.y - this.margin == this.player.y - 2 &&
-      //       coordinate.x == this.player.x - 2
-      //   );
-      //   console.log("cow:", cow);
-
-      //   this.player.y += 20;
-      //   console.log(
-      //     "playerCoordinates",
-      //     "X: ",
-      //     this.player.x,
-      //     "Y:",
-      //     this.player.y
-      //   );
-      // } else {
-      //   console.log("You can not cross a body of water.");
-      //   // console.log("Boundary:", this.boundaries[]);
-      //   this.player.y = this.player.y -20;
-      //   console.log(
-      //     "playerCoordinates",
-      //     "X: ",
-      //     this.player.x,
-      //     "Y:",
-      //     this.player.y
-      //   );
-      // }
     },
     moveRight() {
       if (this.player.x != 480) {
         var boundaryFound = this.boundaries.find(
-            boundaries  => boundaries.x - 20 == this.player.x && boundaries.y +20 == this.player.y )
+            boundaries  => boundaries.x - 20 == this.player.x && boundaries.y  == this.player.y )
           if (!boundaryFound){
         console.log("Player moved East");
         this.subtractEnergy();

@@ -21,7 +21,7 @@ export default {
         y: this.plantInfo.y,
         height: 20,
         width: 20,
-        fill: "white",
+        fill: "#8C775C",
         stroke: "green",
         strokeWidth: 0.5
       },

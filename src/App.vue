@@ -54,6 +54,7 @@
 
         <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
         <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
+        <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
       </v-layer>
   </v-stage>
 </template>
@@ -80,11 +81,12 @@ export default {
   data() {
     return {
       tileArray: [],
-      plantArray: [],
-      inventoryArray: [],
       boundariesArray: [],
       HomeArray: [{x:480, y:440}],
-      waterArray: [{ x: 100, y: 80, tileID: "water" }],
+      wallArray: [],
+      plantArray: [],
+      inventoryArray: [],
+      waterArray: [],
 
       food: 0,
       amount: "0/6",
@@ -100,25 +102,20 @@ export default {
       configKonva: {
         width: 2000,
         height: 2000,
-        color: "blue"
       }
-      // square: {
-      //   x: 100,
-      //   y: 100,
-      //   height: 20,
-      //   width: 20,
-      //   fill: "white",
-      //   stroke: "black",
-      //   strokeWidth: 1
-      // }
     };
   },
   mounted() {
     this.generateGrid();
+    this.generateBoundaries();
     this.generateWater();
   },
 
   methods: {
+
+    // Build Area first
+
+    // 
     generateGrid() {
       var id = 0;
       var i = 20;
@@ -130,17 +127,38 @@ export default {
 
         for (i = 20; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: id, show: "O" });
-          // this.boundariesArray.push({
-          //   x: xSpace,
-          //   y: ySpace,
-          //   tileID: "boarder#:" + id
-          // });
           xSpace += 20;
           id++;
         }
         ySpace += 20;
       }
     },
+
+    //
+
+    generateBoundaries(){
+     var id = 0;
+      var i = 20;
+      var j = 20;
+      var xSpace = 160;
+      var ySpace = 200;
+
+      for (j = 5; j > 0; j--) {
+
+          this.wallArray.push({
+            x: xSpace,
+            y: ySpace,
+            tileID: "wallTile#:" + id
+          });
+          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
+
+          id++;
+        ySpace += 20;
+        }
+      },
+
+
+    //
     generateWater() {
       var id = 0;
       var i = 20;
