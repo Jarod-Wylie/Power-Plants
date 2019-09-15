@@ -43,16 +43,20 @@
         <!-- <BoundaryTile></BoundaryTile> -->
 
         <Player
+          :HomeInfo="HomeArray[0]"
+          :boundaries="boundariesArray"
+          :plantArray="plantArray"
+          :waterArray="waterArray"
+
+          @irrigateHere="irrigate"
           @plantHere="plant"
           @harvestHere="harvest"
-          :plantArray="plantArray"
-          :boundaries="boundariesArray"
-          :HomeInfo="HomeArray[0]"
         ></Player>
 
         <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
 
         <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
+        <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
         <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
         <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
       </v-layer>
@@ -63,6 +67,7 @@
 import Tile from "./Tile.vue";
 import Player from "./Player.vue";
 import BoundaryTile from "./BoundaryTile.vue";
+import irrigationTile from "./irrigationTile.vue";
 import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
 import HomeTile from "./HomeTile.vue";
@@ -76,17 +81,19 @@ export default {
     HomeTile: HomeTile,
     BoundaryTile: BoundaryTile,
     PlantTile: PlantTile,
-    waterTile: waterTile
+    waterTile: waterTile,
+    irrigationTile: irrigationTile,
   },
   data() {
     return {
       tileArray: [],
-      boundariesArray: [],
       HomeArray: [{x:480, y:440}],
+      boundariesArray: [],
       wallArray: [],
       plantArray: [],
       inventoryArray: [],
       waterArray: [],
+      irrigationArray: [],
 
       food: 0,
       amount: "0/6",
@@ -180,6 +187,16 @@ export default {
         }
         ySpace += 20;
       }
+    },
+
+    irrigate(obj){
+
+      console.log("irrigated", obj);
+
+      this.irrigationArray.push(obj);
+
+      console.log("plant Array:", this.irrigationArray);
+
     },
 
     // Initiated when player emits plantHere

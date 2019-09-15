@@ -20,8 +20,8 @@ export default {
         y: this.waterInfo.y,
         height: 20,
         width: 20,
-        fill: "blue",
-        stroke: "blue",
+        fill: "#477DEF",
+        stroke: "#477DEF",
         strokeWidth: 1,
       },
       }

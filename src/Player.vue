@@ -23,8 +23,10 @@
 
     <!-- Farming Actions -->
     <v-circle @click="plant()" :config="Plant" />
-    <v-text @click="harvest()" :config="Harvest" />
+    <v-circle @click="irrigate()" :config="Irrigate"/>
+    <v-rect @click="harvest()" :config="Harvest" />
 
+    <!-- <v-rect :config="playerShadow"/> -->
     <v-text :config="player" />
   </div>
 </template>
@@ -33,9 +35,10 @@
 export default {
   name: "Player",
   props: {
-    plantArray: Array,
+    HomeInfo: Object,
     boundaries: Array,
-    HomeInfo: Object
+    waterArray: Array,
+    plantArray: Array,
   },
   data() {
     return {
@@ -44,9 +47,16 @@ export default {
       player: {
         x: this.HomeInfo.x,
         y: this.HomeInfo.y,
-        fontSize: 15,
-        text: "@",
-        fill: "red"
+        fontSize: 25,
+        text: "\u0FC7",
+        fill: "#EF4700"
+      },
+      playerShadow:{
+        x: this.HomeInfo.x,
+        y: this.HomeInfo.y,
+        height: 20,
+        width: 20,
+        fill: "#7C736D"
       },
       PlayerLog: {
         x: 100,
@@ -129,12 +139,25 @@ export default {
         text: "Plant",
 
       },
-      Harvest: {
-        x: 800,
+      Irrigate: {
+        x: 910,
         y: 550,
-        fontSize: 15,
-        text: "Harvest",
-        color: "green"
+        radius: 25,
+        fill: '#477DEF',
+        stroke:'black',
+        text: "Plant",
+
+      },
+
+      Harvest: {
+        x: 780,
+        y: 550,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        // fontSize: 15,
+        // text: "Harvest",
+        fill: "orange"
       }
     };
   },
@@ -239,6 +262,52 @@ export default {
       });
       this.plantID++;
     },
+
+    irrigate(){
+
+        var waterFoundLeft = this.waterArray.find(
+          water =>
+            water.x + 20 == this.player.x && water.y == this.player.y
+        );
+        var waterFoundRight = this.waterArray.find(
+          water =>
+            water.x - 20 == this.player.x && water.y == this.player.y
+        );
+        var waterFoundUp = this.waterArray.find(
+          water =>
+            water.x == this.player.x && water.y + 20 == this.player.y
+        );
+        var waterFoundDown = this.waterArray.find(
+          water =>
+            water.x == this.player.x && water.y -20 == this.player.y
+        );
+        if (waterFoundLeft || waterFoundRight) {
+
+          console.log("Player is irrigating......");
+  
+          this.$emit("irrigateHere", {
+            id: this.plantID,
+            x: this.player.x,
+            y: this.player.y,
+            orientation: "horizontal"
+          });
+          this.plantID++;
+        }
+        else if(waterFoundUp || waterFoundDown){
+          this.$emit("irrigateHere", {
+            id: this.plantID,
+            x: this.player.x,
+            y: this.player.y,
+            orientation: "veritcal"
+          });
+          this.plantID++;
+
+        }
+        else{console.log("No water found.")}
+      
+    },
+
+    },
     harvest() {
       if (
         this.plantArray.find(
@@ -256,6 +325,6 @@ export default {
         console.log("plantArray", this.plantArray);
       }
     }
-  }
+
 };
 </script>

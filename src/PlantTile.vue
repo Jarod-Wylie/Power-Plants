@@ -30,7 +30,7 @@ export default {
         x: this.plantInfo.x,
         y: this.plantInfo.y,
         fontSize: 15,
-        text: "p",
+        text: " p",
         stroke: "black"
       }
     };
