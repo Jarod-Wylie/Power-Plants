@@ -1,5 +1,7 @@
 <template>
   <div>
+
+    
     <!-- Player Location -->
     <v-text :config="PlayerLog" />
 
@@ -26,23 +28,44 @@
     <v-circle @click="irrigate()" :config="Irrigate"/>
     <v-rect @click="harvest()" :config="Harvest" />
 
+    <!-- Social Actions -->
+    <v-circle @click="talk()" :config="talkButton"/>
+
     <!-- <v-rect :config="playerShadow"/> -->
     <v-text :config="player" />
+
+    <!-- Characters and Enemies -->
+    <enemy></enemy>
+
+    <Character :CharacterInfo="CharacterInfo"></Character>
+    <v-text :config="characterSpeech"/>
+    
   </div>
 </template>
 
 <script>
+import Character from "./Character.vue";
+import Enemy from "./Enemy.vue";
+
 export default {
   name: "Player",
+  components:{
+    Enemy: Enemy,
+    Character: Character,
+  },
   props: {
     HomeInfo: Object,
+    Perimeter: Object,
     boundaries: Array,
     waterArray: Array,
+    irrigationArray: Array,
     plantArray: Array,
   },
   data() {
     return {
       plantID: 0,
+
+      playerBoundaries: this.boundaries,
 
       player: {
         x: this.HomeInfo.x,
@@ -158,25 +181,51 @@ export default {
         // fontSize: 15,
         // text: "Harvest",
         fill: "orange"
+      },
+
+      talkButton:{
+        x: 910,
+        y: 400,
+        radius: 25,
+        fill: "red",
+        stroke: "black",
+      },
+
+      // Character Data
+      CharacterInfo: {x:300, y:460, name:"Rich Hoagie", 
+                      replies:["","I am not feeling very well today.",
+                               "Maybe I'll find time to fix the tank some time this week."]},
+      characterSpeech: {
+        x: null,
+        y: null,
+        stroke: "Black",
+        fontSize: 20,
+        text: "",
       }
     };
   },
   mounted() {
     this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+
+    this.playerBoundaries.push(this.CharacterInfo);
+
+    this.characterSpeech.x = this.CharacterInfo.x + 18
+    this.characterSpeech.y = this.CharacterInfo.y - 10
+
   },
   computed: {},
 
   methods: {
     moveUp() {
       
-      if (this.player.y != 100) {
-        var boundaryFound = this.boundaries.find(
-          boundaries =>
-            boundaries.x == this.player.x && boundaries.y + 20 == this.player.y
+      if (this.player.y != this.Perimeter.yUp) {
+        var boundaryFound = this.playerBoundaries.find(
+          playerBoundaries =>
+            playerBoundaries.x == this.player.x && playerBoundaries.y + 20 == this.player.y
         );
         if (!boundaryFound) {
           console.log("Player moved North");
-          console.log("Boundaries Array", this.boundaries);
+          // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
           this.player.y -= 20;
           this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
@@ -184,9 +233,9 @@ export default {
       }
     },
     moveDown() {
-      if (this.player.y != 480) {
-        var boundaryFound = this.boundaries.find(
-            boundaries  => boundaries.x == this.player.x && boundaries.y -20 == this.player.y )
+      if (this.player.y != this.Perimeter.yDown) {
+        var boundaryFound = this.playerBoundaries.find(
+            playerBoundaries  => playerBoundaries.x == this.player.x && playerBoundaries.y -20 == this.player.y )
           if (!boundaryFound){
         console.log("Player moved South");
         this.subtractEnergy();
@@ -196,9 +245,9 @@ export default {
       }
     },
     moveRight() {
-      if (this.player.x != 480) {
-        var boundaryFound = this.boundaries.find(
-            boundaries  => boundaries.x - 20 == this.player.x && boundaries.y  == this.player.y )
+      if (this.player.x != this.Perimeter.xRight) {
+        var boundaryFound = this.playerBoundaries.find(
+            playerBoundaries  => playerBoundaries.x - 20 == this.player.x && playerBoundaries.y  == this.player.y )
           if (!boundaryFound){
         console.log("Player moved East");
         this.subtractEnergy();
@@ -208,10 +257,10 @@ export default {
       }
     },
     moveLeft() {
-      if (this.player.x != 100) {
-        var boundaryFound = this.boundaries.find(
-          boundaries =>
-            boundaries.x + 20 == this.player.x && boundaries.y == this.player.y
+      if (this.player.x != this.Perimeter.xLeft) {
+        var boundaryFound = this.playerBoundaries.find(
+          playerBoundaries =>
+            playerBoundaries.x + 20 == this.player.x && playerBoundaries.y == this.player.y
         );
         if (!boundaryFound) {
           console.log("Player moved West");
@@ -220,13 +269,13 @@ export default {
           this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
-      console.log(
-        "playerCoordinates",
-        "X: ",
-        this.player.x,
-        "Y:",
-        this.player.y
-      );
+      // console.log(
+      //   "playerCoordinates",
+      //   "X: ",
+      //   this.player.x,
+      //   "Y:",
+      //   this.player.y
+      // );
     },
 
     // Player Status Functions
@@ -253,14 +302,89 @@ export default {
 
     // Horticulture methods
     plant() {
-      console.log("Player is planting.....");
+      var plantFound = plantFound = this.plantArray.find(
+          plant =>
+            (plant.x == this.player.x && plant.y == this.player.y) || 
+            (plant.x == this.player.x + 20 && plant.y == this.player.y) ||
+            (plant.x == this.player.x - 20 && plant.y == this.player.y) ||
+            (plant.x == this.player.x && plant.y == this.player.y + 20) ||
+            (plant.x == this.player.x && plant.y == this.player.y - 20) ||
+            (plant.x == this.player.x + 20 && plant.y == this.player.y - 20) ||
+            (plant.x == this.player.x - 20 && plant.y == this.player.y + 20) ||
+            (plant.x == this.player.x + 20 && plant.y == this.player.y + 20) ||
+            (plant.x == this.player.x - 20 && plant.y == this.player.y - 20) 
+        );
 
-      this.$emit("plantHere", {
-        id: this.plantID,
-        x: this.player.x,
-        y: this.player.y
-      });
-      this.plantID++;
+      var waterFoundLeft = this.waterArray.find(
+          water =>
+            water.x + 20 == this.player.x && water.y == this.player.y
+        );
+        var waterFoundRight = this.waterArray.find(
+          water =>
+            water.x - 20 == this.player.x && water.y == this.player.y
+        );
+        var waterFoundUp = this.waterArray.find(
+          water =>
+            water.x == this.player.x && water.y + 20 == this.player.y
+        );
+        var waterFoundDown = this.waterArray.find(
+          water =>
+            water.x == this.player.x && water.y -20 == this.player.y
+        );
+
+        var irrigatationFoundHere = this.irrigationArray.find(
+          water =>
+            water.x == this.player.x && water.y == this.player.y
+        );
+
+        var irrigatationFoundLeft = this.irrigationArray.find(
+          water =>
+            water.x + 20 == this.player.x && water.y == this.player.y
+        );
+        var irrigatationFoundRight = this.irrigationArray.find(
+          water =>
+            water.x - 20 == this.player.x && water.y == this.player.y
+        );
+        var irrigatationFoundUp = this.irrigationArray.find(
+          water =>
+            water.x == this.player.x && water.y + 20 == this.player.y
+        );
+        var irrigatationFoundDown = this.irrigationArray.find(
+          water =>
+            water.x == this.player.x && water.y -20 == this.player.y
+        );
+
+      if((waterFoundLeft || waterFoundRight || waterFoundUp || waterFoundDown ||
+         irrigatationFoundLeft || irrigatationFoundRight || irrigatationFoundUp || irrigatationFoundDown) &&
+         (!irrigatationFoundHere)){
+
+        // console.log("irrgationFounHere:", irrigatationFoundHere)
+        
+        console.log("Player is planting.....");
+        
+        this.$emit("plantHere", {
+          id: this.plantID,
+          x: this.player.x,
+          y: this.player.y
+        });
+        this.plantID++;
+      }
+
+      else if(plantFound || irrigatationFoundHere){
+        console.log("There is not enough water in the soil to plant another plant here.")
+
+      }
+      else {
+        console.log("Player is planting.....");
+        
+        this.$emit("plantHere", {
+          id: this.plantID,
+          x: this.player.x,
+          y: this.player.y
+        });
+        this.plantID++;
+      }
+
     },
 
     irrigate(){
@@ -281,7 +405,26 @@ export default {
           water =>
             water.x == this.player.x && water.y -20 == this.player.y
         );
-        if (waterFoundLeft || waterFoundRight) {
+
+        var irrigatationFoundLeft = this.irrigationArray.find(
+          water =>
+            water.x + 20 == this.player.x && water.y == this.player.y
+        );
+        var irrigatationFoundRight = this.irrigationArray.find(
+          water =>
+            water.x - 20 == this.player.x && water.y == this.player.y
+        );
+        var irrigatationFoundUp = this.irrigationArray.find(
+          water =>
+            water.x == this.player.x && water.y + 20 == this.player.y
+        );
+        var irrigatationFoundDown = this.irrigationArray.find(
+          water =>
+            water.x == this.player.x && water.y -20 == this.player.y
+        );
+
+
+        if (waterFoundLeft || waterFoundRight || irrigatationFoundLeft || irrigatationFoundRight) {
 
           console.log("Player is irrigating......");
   
@@ -293,7 +436,7 @@ export default {
           });
           this.plantID++;
         }
-        else if(waterFoundUp || waterFoundDown){
+        else if(waterFoundUp || waterFoundDown || irrigatationFoundUp || irrigatationFoundDown){
           this.$emit("irrigateHere", {
             id: this.plantID,
             x: this.player.x,
@@ -303,10 +446,10 @@ export default {
           this.plantID++;
 
         }
-        else{console.log("No water found.")}
+        else{
+          console.log("No water found.");
+          }
       
-    },
-
     },
     harvest() {
       if (
@@ -324,7 +467,21 @@ export default {
         console.log("nothing to harvest");
         console.log("plantArray", this.plantArray);
       }
+    },
+    // End of Horticulture Methods
+
+    talk(){
+      if (
+        (this.player.x == this.CharacterInfo.x + 20) && (this.player.y == this.CharacterInfo.y ) ||
+        (this.player.x == this.CharacterInfo.x - 20) && (this.player.y == this.CharacterInfo.y ) ||
+        (this.player.x == this.CharacterInfo.x) && (this.player.y == this.CharacterInfo.y + 20 ) ||
+        (this.player.x == this.CharacterInfo.x) && (this.player.y == this.CharacterInfo.y - 20)){
+        console.log("hoi");
+        this.characterSpeech.text = this.CharacterInfo.replies[1];
+
+      }
     }
+    },
 
 };
 </script>

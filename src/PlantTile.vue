@@ -46,7 +46,7 @@ export default {
       this.square.x = this.plantInfo.x;
       this.square.y = this.plantInfo.y;
       this.growPlant();
-    }, 1000);
+    }, 10000);
 
   },
 

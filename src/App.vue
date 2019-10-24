@@ -44,9 +44,11 @@
 
         <Player
           :HomeInfo="HomeArray[0]"
+          :Perimeter="Perimeter"
           :boundaries="boundariesArray"
           :plantArray="plantArray"
           :waterArray="waterArray"
+          :irrigationArray="irrigationArray"
 
           @irrigateHere="irrigate"
           @plantHere="plant"
@@ -59,6 +61,8 @@
         <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
         <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
         <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
+
+        <!-- <Enemy></Enemy> -->
       </v-layer>
   </v-stage>
 </template>
@@ -72,7 +76,6 @@ import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
 import HomeTile from "./HomeTile.vue";
 
-import { log } from "util";
 
 export default {
   components: {
@@ -83,11 +86,13 @@ export default {
     PlantTile: PlantTile,
     waterTile: waterTile,
     irrigationTile: irrigationTile,
+    
   },
   data() {
     return {
       tileArray: [],
-      HomeArray: [{x:480, y:440}],
+      Perimeter: {xLeft: 0, xRight: 0, yUp: 0, yDown: null},
+      HomeArray: [{x:100, y:440}],
       boundariesArray: [],
       wallArray: [],
       plantArray: [],
@@ -128,26 +133,30 @@ export default {
       var i = 20;
       var j = 20;
       var ySpace = 100;
+      var xSpace = 100;
 
-      for (j = 20; j > 0; j--) {
-        var xSpace = 100;
+      this.Perimeter.yUp = ySpace;
+      this.Perimeter.xLeft = xSpace;
+      for (j = 40; j > 0; j--) {
+        xSpace = 100;
 
-        for (i = 20; i > 0; i--) {
+        for (i = 40; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: id, show: "O" });
           xSpace += 20;
           id++;
         }
         ySpace += 20;
       }
+      this.Perimeter.xRight = xSpace -20;
+      this.Perimeter.yDown = ySpace;
     },
 
     //
-
     generateBoundaries(){
      var id = 0;
       var i = 20;
       var j = 20;
-      var xSpace = 160;
+      var xSpace = 100;
       var ySpace = 200;
 
       for (j = 5; j > 0; j--) {
@@ -161,6 +170,21 @@ export default {
 
           id++;
         ySpace += 20;
+        }
+        ySpace = 700
+
+        for (j = 40; j > 0; j--) {
+
+
+          this.wallArray.push({
+            x: xSpace,
+            y: ySpace,
+            tileID: "wallTile#:" + id
+          });
+          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
+
+          id++;
+        xSpace += 20;
         }
       },
 
