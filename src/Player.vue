@@ -1,7 +1,5 @@
 <template>
   <div>
-
-    
     <!-- Player Location -->
     <v-text :config="PlayerLog" />
 
@@ -11,25 +9,25 @@
     <!-- Actions players can take -->
 
     <!-- Directions -->
-    <v-rect @click="moveUp()" :config="upButton"/>
+    <v-rect @click="moveUp()" :config="upButton" />
     <v-text @click="moveUp()" :config="Up" />
 
-    <v-rect @click="moveDown()" :config="downButton"/>
+    <v-rect @click="moveDown()" :config="downButton" />
     <v-text @click="moveDown()" :config="Down" />
 
-    <v-rect @click="moveRight()" :config="rightButton"/>
+    <v-rect @click="moveRight()" :config="rightButton" />
     <v-text @click="moveRight()" :config="Right" />
 
-    <v-rect @click="moveLeft()" :config="leftButton"/>
+    <v-rect @click="moveLeft()" :config="leftButton" />
     <v-text @keyup.left="moveLeft()" @click="moveLeft()" :config="Left" />
 
     <!-- Farming Actions -->
     <v-circle @click="plant()" :config="Plant" />
-    <v-circle @click="irrigate()" :config="Irrigate"/>
+    <v-circle @click="irrigate()" :config="Irrigate" />
     <v-rect @click="harvest()" :config="Harvest" />
 
     <!-- Social Actions -->
-    <v-circle @click="talk()" :config="talkButton"/>
+    <v-circle @click="talk()" :config="talkButton" />
 
     <!-- <v-rect :config="playerShadow"/> -->
     <v-text :config="player" />
@@ -38,8 +36,7 @@
     <enemy></enemy>
 
     <Character :CharacterInfo="CharacterInfo"></Character>
-    <v-text :config="characterSpeech"/>
-    
+    <v-text :config="characterSpeech" />
   </div>
 </template>
 
@@ -49,9 +46,9 @@ import Enemy from "./Enemy.vue";
 
 export default {
   name: "Player",
-  components:{
+  components: {
     Enemy: Enemy,
-    Character: Character,
+    Character: Character
   },
   props: {
     HomeInfo: Object,
@@ -60,9 +57,11 @@ export default {
     waterArray: Array,
     irrigationArray: Array,
     plantArray: Array,
+    steps: Array
   },
   data() {
     return {
+      interval: null,
       plantID: 0,
 
       playerBoundaries: this.boundaries,
@@ -74,7 +73,12 @@ export default {
         text: "\u0FC7",
         fill: "#EF4700"
       },
-      playerShadow:{
+
+      playerLevel: false,
+      onPlatform: false,
+      
+
+      playerShadow: {
         x: this.HomeInfo.x,
         y: this.HomeInfo.y,
         height: 20,
@@ -94,13 +98,13 @@ export default {
         text: "/////////////////",
         stroke: "green"
       },
-      upButton:{
-        x:780,
-        y:390,
-        width:60,
-        height:40,
+      upButton: {
+        x: 780,
+        y: 390,
+        width: 60,
+        height: 40,
         fill: "#CCDDE2",
-        stroke: "black",
+        stroke: "black"
       },
       Up: {
         x: 800,
@@ -109,13 +113,13 @@ export default {
         text: ""
       },
 
-      downButton:{
-        x:780,
-        y:500,
-        width:60,
-        height:40,
+      downButton: {
+        x: 780,
+        y: 500,
+        width: 60,
+        height: 40,
         fill: "#CCDDE2",
-        stroke: "black",
+        stroke: "black"
       },
       Down: {
         x: 800,
@@ -124,13 +128,13 @@ export default {
         text: ""
       },
 
-      rightButton:{
-        x:865,
-        y:450,
-        width:60,
-        height:40,
+      rightButton: {
+        x: 865,
+        y: 450,
+        width: 60,
+        height: 40,
         fill: "#CCDDE2",
-        stroke: "black",
+        stroke: "black"
       },
       Right: {
         x: 900,
@@ -138,13 +142,13 @@ export default {
         text: ""
       },
 
-      leftButton:{
-        x:700,
-        y:450,
-        width:60,
-        height:40,
+      leftButton: {
+        x: 700,
+        y: 450,
+        width: 60,
+        height: 40,
         fill: "#CCDDE2",
-        stroke: "black",
+        stroke: "black"
       },
       Left: {
         x: 700,
@@ -157,19 +161,17 @@ export default {
         x: 810,
         y: 460,
         radius: 25,
-        fill: 'green',
-        stroke:'black',
-        text: "Plant",
-
+        fill: "green",
+        stroke: "black",
+        text: "Plant"
       },
       Irrigate: {
         x: 910,
         y: 550,
         radius: 25,
-        fill: '#477DEF',
-        stroke:'black',
-        text: "Plant",
-
+        fill: "#477DEF",
+        stroke: "black",
+        text: "Plant"
       },
 
       Harvest: {
@@ -183,24 +185,31 @@ export default {
         fill: "orange"
       },
 
-      talkButton:{
+      talkButton: {
         x: 910,
         y: 400,
         radius: 25,
         fill: "red",
-        stroke: "black",
+        stroke: "black"
       },
 
       // Character Data
-      CharacterInfo: {x:300, y:460, name:"Rich Hoagie", 
-                      replies:["","I am not feeling very well today.",
-                               "Maybe I'll find time to fix the tank some time this week."]},
+      CharacterInfo: {
+        x: 300,
+        y: 460,
+        name: "Rich Hoagie",
+        replies: [
+          "",
+          "I am not feeling very well today.",
+          "Maybe I'll find time to fix the tank some time this week."
+        ]
+      },
       characterSpeech: {
         x: null,
         y: null,
         stroke: "Black",
         fontSize: 20,
-        text: "",
+        text: ""
       }
     };
   },
@@ -209,22 +218,64 @@ export default {
 
     this.playerBoundaries.push(this.CharacterInfo);
 
-    this.characterSpeech.x = this.CharacterInfo.x + 18
-    this.characterSpeech.y = this.CharacterInfo.y - 10
-
+    this.characterSpeech.x = this.CharacterInfo.x + 18;
+    this.characterSpeech.y = this.CharacterInfo.y - 10;
   },
   computed: {},
 
   methods: {
     moveUp() {
-      
       if (this.player.y != this.Perimeter.yUp) {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
-            playerBoundaries.x == this.player.x && playerBoundaries.y + 20 == this.player.y
+            playerBoundaries.x == this.player.x &&
+            playerBoundaries.y + 20 == this.player.y
         );
-        if (!boundaryFound) {
+          // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
+          if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+
+        var stepFound = this.steps.find(
+          steps => steps.x == this.player.x && steps.y + 20 == this.player.y
+        );
+
+        if (stepFound) {
+          this.player.y -= 20
+          this.playerLevel = null
+          console.log("stepFound:", this.playerLevel);
+          return null
+        }
+
+        if ((boundaryFound) && (this.playerLevel == true || this.playerLevel == null)) {
+          this.playerLevel = true;
           console.log("Player moved North");
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.y -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+
+          console.log("On Platform:", this.playerLevel);
+          console.log("level 2");
+          return "movement completed";
+        }
+
+          if (!boundaryFound && this.playerLevel == true) {
+          // this.playerLevel = false
+          console.log("is the playe on a platform?", this.onPlatform)
+          console.log("Player Level Platform block:", this.playerLevel);
+          this.subtractEnergy();
+          // this.player.y -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          return null
+        }
+
+
+        if (!boundaryFound && (this.playerLevel == false || this.playerLevel == null)) {
+          this.playerLevel = false
+          console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
           this.player.y -= 20;
@@ -235,47 +286,196 @@ export default {
     moveDown() {
       if (this.player.y != this.Perimeter.yDown) {
         var boundaryFound = this.playerBoundaries.find(
-            playerBoundaries  => playerBoundaries.x == this.player.x && playerBoundaries.y -20 == this.player.y )
-          if (!boundaryFound){
-        console.log("Player moved South");
-        this.subtractEnergy();
-        this.player.y += 20;
-        this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
-      }
+          playerBoundaries =>
+            playerBoundaries.x == this.player.x &&
+            playerBoundaries.y - 20 == this.player.y
+        );
+
+         if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+         // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
+          if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+
+        var stepFound = this.steps.find(
+          steps => steps.x == this.player.x && steps.y - 20 == this.player.y
+        );
+
+        if (stepFound) {
+           this.player.y += 20
+          this.playerLevel = null
+          console.log("stepFound:", this.playerLevel);
+          return null
+        }
+
+        if ((boundaryFound) && (this.playerLevel == true || this.playerLevel == null)) {
+          this.playerLevel = true
+          console.log("Player moved North");
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.y += 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+
+          console.log("On Platform:", this.playerLevel);
+          console.log("level 2");
+          return "movement completed";
+        }
+
+          if (!boundaryFound && this.playerLevel == true) {
+          // this.playerLevel = false
+          console.log("is the playe on a platform?", this.onPlatform)
+          console.log("Player Level Platform block:", this.playerLevel);
+          this.subtractEnergy();
+          // this.player.y -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          return null
+        }
+
+
+        if (!boundaryFound && (this.playerLevel == false || this.playerLevel == null)) {
+          this.playerLevel = false
+          console.log("Player Level ground main:", this.playerLevel);
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.y += 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        }
       }
     },
     moveRight() {
       if (this.player.x != this.Perimeter.xRight) {
         var boundaryFound = this.playerBoundaries.find(
-            playerBoundaries  => playerBoundaries.x - 20 == this.player.x && playerBoundaries.y  == this.player.y )
-          if (!boundaryFound){
-        console.log("Player moved East");
-        this.subtractEnergy();
-        this.player.x += 20;
-        this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
-      }
+          playerBoundaries =>
+            playerBoundaries.x - 20 == this.player.x &&
+            playerBoundaries.y == this.player.y
+        );
+
+         if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+        // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
+          if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+
+        var stepFound = this.steps.find(
+          steps => steps.x - 20 == this.player.x && steps.y == this.player.y
+        );
+
+        if (stepFound) {
+           this.player.x += 20
+          this.playerLevel = null
+          console.log("stepFound:", this.playerLevel);
+          return null
+        }
+
+        if ((boundaryFound) && (this.playerLevel == true || this.playerLevel == null)) {
+          this.playerLevel = true
+          console.log("Player moved North");
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.x += 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+
+          console.log("On Platform:", this.playerLevel);
+          console.log("level 2");
+          return "movement completed";
+        }
+
+          if (!boundaryFound && this.playerLevel == true) {
+          // this.playerLevel = false
+          console.log("is the playe on a platform?", this.onPlatform)
+          console.log("Player Level Platform block:", this.playerLevel);
+          this.subtractEnergy();
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          return null
+        }
+
+
+        if (!boundaryFound && (this.playerLevel == false || this.playerLevel == null)) {
+          this.playerLevel = false
+          console.log("Player Level ground main:", this.playerLevel);
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.x += 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+        }
       }
     },
     moveLeft() {
       if (this.player.x != this.Perimeter.xLeft) {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
-            playerBoundaries.x + 20 == this.player.x && playerBoundaries.y == this.player.y
+            playerBoundaries.x + 20 == this.player.x &&
+            playerBoundaries.y == this.player.y
         );
-        if (!boundaryFound) {
-          console.log("Player moved West");
+         if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+
+        // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
+          if(boundaryFound){
+            if (boundaryFound.type == "water") {
+              return "Block: invalid boundary type: water";
+          }
+          }
+
+        var stepFound = this.steps.find(
+          steps => steps.x + 20 == this.player.x && steps.y == this.player.y
+        );
+
+        if (stepFound) {
+           this.player.x -= 20
+          this.playerLevel = null
+          console.log("stepFound:", this.playerLevel);
+          return null
+        }
+
+        if ((boundaryFound) && (this.playerLevel == true || this.playerLevel == null)) {
+          this.playerLevel = true
+          console.log("Player moved North");
+          // console.log("playerBoundaries Array", this.playerBoundaries);
+          this.subtractEnergy();
+          this.player.x -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+
+          console.log("On Platform:", this.playerLevel);
+          console.log("level 2");
+          return "movement completed";
+        }
+
+          if (!boundaryFound && this.playerLevel == true) {
+          // this.playerLevel = false
+          console.log("is the playe on a platform?", this.onPlatform)
+          console.log("Player Level Platform block:", this.playerLevel);
+          this.subtractEnergy();
+          // this.player.y -= 20;
+          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          return null
+        }
+
+
+        if (!boundaryFound && (this.playerLevel == false || this.playerLevel == null)) {
+          this.playerLevel = false
+          console.log("Player Level ground main:", this.playerLevel);
+          // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
           this.player.x -= 20;
           this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
-      // console.log(
-      //   "playerCoordinates",
-      //   "X: ",
-      //   this.player.x,
-      //   "Y:",
-      //   this.player.y
-      // );
     },
 
     // Player Status Functions
@@ -302,66 +502,77 @@ export default {
 
     // Horticulture methods
     plant() {
-      var plantFound = plantFound = this.plantArray.find(
-          plant =>
-            (plant.x == this.player.x && plant.y == this.player.y) || 
-            (plant.x == this.player.x + 20 && plant.y == this.player.y) ||
-            (plant.x == this.player.x - 20 && plant.y == this.player.y) ||
-            (plant.x == this.player.x && plant.y == this.player.y + 20) ||
-            (plant.x == this.player.x && plant.y == this.player.y - 20) ||
-            (plant.x == this.player.x + 20 && plant.y == this.player.y - 20) ||
-            (plant.x == this.player.x - 20 && plant.y == this.player.y + 20) ||
-            (plant.x == this.player.x + 20 && plant.y == this.player.y + 20) ||
-            (plant.x == this.player.x - 20 && plant.y == this.player.y - 20) 
-        );
+      var plantFound = (plantFound = this.plantArray.find(
+        plant =>
+          (plant.x == this.player.x && plant.y == this.player.y) ||
+          (plant.x == this.player.x + 20 && plant.y == this.player.y) ||
+          (plant.x == this.player.x - 20 && plant.y == this.player.y) ||
+          (plant.x == this.player.x && plant.y == this.player.y + 20) ||
+          (plant.x == this.player.x && plant.y == this.player.y - 20) ||
+          (plant.x == this.player.x + 20 && plant.y == this.player.y - 20) ||
+          (plant.x == this.player.x - 20 && plant.y == this.player.y + 20) ||
+          (plant.x == this.player.x + 20 && plant.y == this.player.y + 20) ||
+          (plant.x == this.player.x - 20 && plant.y == this.player.y - 20)
+      ));
 
       var waterFoundLeft = this.waterArray.find(
-          water =>
-            water.x + 20 == this.player.x && water.y == this.player.y
-        );
-        var waterFoundRight = this.waterArray.find(
-          water =>
-            water.x - 20 == this.player.x && water.y == this.player.y
-        );
-        var waterFoundUp = this.waterArray.find(
-          water =>
-            water.x == this.player.x && water.y + 20 == this.player.y
-        );
-        var waterFoundDown = this.waterArray.find(
-          water =>
-            water.x == this.player.x && water.y -20 == this.player.y
-        );
+        water => water.x + 20 == this.player.x && water.y == this.player.y
+      );
+      var waterFoundRight = this.waterArray.find(
+        water => water.x - 20 == this.player.x && water.y == this.player.y
+      );
+      var waterFoundUp = this.waterArray.find(
+        water => water.x == this.player.x && water.y + 20 == this.player.y
+      );
+      var waterFoundDown = this.waterArray.find(
+        water => water.x == this.player.x && water.y - 20 == this.player.y
+      );
 
-        var irrigatationFoundHere = this.irrigationArray.find(
-          water =>
-            water.x == this.player.x && water.y == this.player.y
-        );
+      var irrigatationFoundHere = this.irrigationArray.find(
+        water => water.x == this.player.x && water.y == this.player.y
+      );
 
-        var irrigatationFoundLeft = this.irrigationArray.find(
-          water =>
-            water.x + 20 == this.player.x && water.y == this.player.y
-        );
-        var irrigatationFoundRight = this.irrigationArray.find(
-          water =>
-            water.x - 20 == this.player.x && water.y == this.player.y
-        );
-        var irrigatationFoundUp = this.irrigationArray.find(
-          water =>
-            water.x == this.player.x && water.y + 20 == this.player.y
-        );
-        var irrigatationFoundDown = this.irrigationArray.find(
-          water =>
-            water.x == this.player.x && water.y -20 == this.player.y
-        );
+      var irrigatationFoundLeft = this.irrigationArray.find(
+        water => water.x + 20 == this.player.x && water.y == this.player.y
+      );
+      var irrigatationFoundRight = this.irrigationArray.find(
+        water => water.x - 20 == this.player.x && water.y == this.player.y
+      );
+      var irrigatationFoundUp = this.irrigationArray.find(
+        water => water.x == this.player.x && water.y + 20 == this.player.y
+      );
+      var irrigatationFoundDown = this.irrigationArray.find(
+        water => water.x == this.player.x && water.y - 20 == this.player.y
+      );
 
-      if((waterFoundLeft || waterFoundRight || waterFoundUp || waterFoundDown ||
-         irrigatationFoundLeft || irrigatationFoundRight || irrigatationFoundUp || irrigatationFoundDown) &&
-         (!irrigatationFoundHere)){
-
+      if (
+        (waterFoundLeft ||
+          waterFoundRight ||
+          waterFoundUp ||
+          waterFoundDown ||
+          irrigatationFoundLeft ||
+          irrigatationFoundRight ||
+          irrigatationFoundUp ||
+          irrigatationFoundDown) &&
+        !irrigatationFoundHere
+      ) {
         // console.log("irrgationFounHere:", irrigatationFoundHere)
-        
+
         console.log("Player is planting.....");
-        
+
+        this.$emit("plantHere", {
+          id: this.plantID,
+          x: this.player.x,
+          y: this.player.y
+        });
+        this.plantID++;
+      } else if (plantFound || irrigatationFoundHere) {
+        console.log(
+          "There is not enough water in the soil to plant another plant here."
+        );
+      } else {
+        console.log("Player is planting.....");
+
         this.$emit("plantHere", {
           id: this.plantID,
           x: this.player.x,
@@ -369,87 +580,66 @@ export default {
         });
         this.plantID++;
       }
-
-      else if(plantFound || irrigatationFoundHere){
-        console.log("There is not enough water in the soil to plant another plant here.")
-
-      }
-      else {
-        console.log("Player is planting.....");
-        
-        this.$emit("plantHere", {
-          id: this.plantID,
-          x: this.player.x,
-          y: this.player.y
-        });
-        this.plantID++;
-      }
-
     },
 
-    irrigate(){
+    irrigate() {
+      var waterFoundLeft = this.waterArray.find(
+        water => water.x + 20 == this.player.x && water.y == this.player.y
+      );
+      var waterFoundRight = this.waterArray.find(
+        water => water.x - 20 == this.player.x && water.y == this.player.y
+      );
+      var waterFoundUp = this.waterArray.find(
+        water => water.x == this.player.x && water.y + 20 == this.player.y
+      );
+      var waterFoundDown = this.waterArray.find(
+        water => water.x == this.player.x && water.y - 20 == this.player.y
+      );
 
-        var waterFoundLeft = this.waterArray.find(
-          water =>
-            water.x + 20 == this.player.x && water.y == this.player.y
-        );
-        var waterFoundRight = this.waterArray.find(
-          water =>
-            water.x - 20 == this.player.x && water.y == this.player.y
-        );
-        var waterFoundUp = this.waterArray.find(
-          water =>
-            water.x == this.player.x && water.y + 20 == this.player.y
-        );
-        var waterFoundDown = this.waterArray.find(
-          water =>
-            water.x == this.player.x && water.y -20 == this.player.y
-        );
+      var irrigatationFoundLeft = this.irrigationArray.find(
+        water => water.x + 20 == this.player.x && water.y == this.player.y
+      );
+      var irrigatationFoundRight = this.irrigationArray.find(
+        water => water.x - 20 == this.player.x && water.y == this.player.y
+      );
+      var irrigatationFoundUp = this.irrigationArray.find(
+        water => water.x == this.player.x && water.y + 20 == this.player.y
+      );
+      var irrigatationFoundDown = this.irrigationArray.find(
+        water => water.x == this.player.x && water.y - 20 == this.player.y
+      );
 
-        var irrigatationFoundLeft = this.irrigationArray.find(
-          water =>
-            water.x + 20 == this.player.x && water.y == this.player.y
-        );
-        var irrigatationFoundRight = this.irrigationArray.find(
-          water =>
-            water.x - 20 == this.player.x && water.y == this.player.y
-        );
-        var irrigatationFoundUp = this.irrigationArray.find(
-          water =>
-            water.x == this.player.x && water.y + 20 == this.player.y
-        );
-        var irrigatationFoundDown = this.irrigationArray.find(
-          water =>
-            water.x == this.player.x && water.y -20 == this.player.y
-        );
+      if (
+        waterFoundLeft ||
+        waterFoundRight ||
+        irrigatationFoundLeft ||
+        irrigatationFoundRight
+      ) {
+        console.log("Player is irrigating......");
 
-
-        if (waterFoundLeft || waterFoundRight || irrigatationFoundLeft || irrigatationFoundRight) {
-
-          console.log("Player is irrigating......");
-  
-          this.$emit("irrigateHere", {
-            id: this.plantID,
-            x: this.player.x,
-            y: this.player.y,
-            orientation: "horizontal"
-          });
-          this.plantID++;
-        }
-        else if(waterFoundUp || waterFoundDown || irrigatationFoundUp || irrigatationFoundDown){
-          this.$emit("irrigateHere", {
-            id: this.plantID,
-            x: this.player.x,
-            y: this.player.y,
-            orientation: "veritcal"
-          });
-          this.plantID++;
-
-        }
-        else{
-          console.log("No water found.");
-          }
-      
+        this.$emit("irrigateHere", {
+          id: this.plantID,
+          x: this.player.x,
+          y: this.player.y,
+          orientation: "horizontal"
+        });
+        this.plantID++;
+      } else if (
+        waterFoundUp ||
+        waterFoundDown ||
+        irrigatationFoundUp ||
+        irrigatationFoundDown
+      ) {
+        this.$emit("irrigateHere", {
+          id: this.plantID,
+          x: this.player.x,
+          y: this.player.y,
+          orientation: "veritcal"
+        });
+        this.plantID++;
+      } else {
+        console.log("No water found.");
+      }
     },
     harvest() {
       if (
@@ -470,18 +660,25 @@ export default {
     },
     // End of Horticulture Methods
 
-    talk(){
+    talk() {
       if (
-        (this.player.x == this.CharacterInfo.x + 20) && (this.player.y == this.CharacterInfo.y ) ||
-        (this.player.x == this.CharacterInfo.x - 20) && (this.player.y == this.CharacterInfo.y ) ||
-        (this.player.x == this.CharacterInfo.x) && (this.player.y == this.CharacterInfo.y + 20 ) ||
-        (this.player.x == this.CharacterInfo.x) && (this.player.y == this.CharacterInfo.y - 20)){
-        console.log("hoi");
+        (this.player.x == this.CharacterInfo.x + 20 &&
+          this.player.y == this.CharacterInfo.y) ||
+        (this.player.x == this.CharacterInfo.x - 20 &&
+          this.player.y == this.CharacterInfo.y) ||
+        (this.player.x == this.CharacterInfo.x &&
+          this.player.y == this.CharacterInfo.y + 20) ||
+        (this.player.x == this.CharacterInfo.x &&
+          this.player.y == this.CharacterInfo.y - 20)
+      ) {
+        console.log("Talking to player");
         this.characterSpeech.text = this.CharacterInfo.replies[1];
-
+        this.interval = setInterval(() => {
+          this.characterSpeech.text = this.CharacterInfo.replies[0];
+          clearInterval(this.interval);
+        }, 3000);
       }
     }
-    },
-
+  }
 };
 </script>

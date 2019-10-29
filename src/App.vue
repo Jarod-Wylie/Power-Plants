@@ -49,6 +49,7 @@
           :plantArray="plantArray"
           :waterArray="waterArray"
           :irrigationArray="irrigationArray"
+          :steps="stepArray"
 
           @irrigateHere="irrigate"
           @plantHere="plant"
@@ -61,6 +62,7 @@
         <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
         <PlantTile v-for="i in plantArray" :key="i.plantID" :plantInfo="i"></PlantTile>
         <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
+        <step1 v-for="i in stepArray" :key='i.x' :stepInfo="i"></step1>
 
         <!-- <Enemy></Enemy> -->
       </v-layer>
@@ -75,6 +77,7 @@ import irrigationTile from "./irrigationTile.vue";
 import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
 import HomeTile from "./HomeTile.vue";
+import step1 from "./step1.vue";
 
 
 export default {
@@ -86,6 +89,7 @@ export default {
     PlantTile: PlantTile,
     waterTile: waterTile,
     irrigationTile: irrigationTile,
+    step1 : step1,
     
   },
   data() {
@@ -99,6 +103,7 @@ export default {
       inventoryArray: [],
       waterArray: [],
       irrigationArray: [],
+      stepArray: [],
 
       food: 0,
       amount: "0/6",
@@ -120,7 +125,9 @@ export default {
   mounted() {
     this.generateGrid();
     this.generateBoundaries();
+    this.generateSteps();
     this.generateWater();
+
   },
 
   methods: {
@@ -157,10 +164,26 @@ export default {
       var i = 20;
       var j = 20;
       var xSpace = 100;
-      var ySpace = 200;
+      var ySpace = 700;
 
-      for (j = 5; j > 0; j--) {
+        for (j = 40; j > 0; j--) {
+          this.wallArray.push({
+            x: xSpace,
+            y: ySpace,
+            tileID: "wallTile#:" + id
+          });
+          this.boundariesArray.push({x: xSpace, y: ySpace, type: 'wall', tileID: "boarder#:" + id })
 
+          id++;
+        xSpace += 20;
+        }
+      xSpace = 100
+      for(i = 6; i > 0; i--){
+        ySpace = 200
+
+
+        for (j = 5; j > 0; j--) {
+          
           this.wallArray.push({
             x: xSpace,
             y: ySpace,
@@ -171,21 +194,21 @@ export default {
           id++;
         ySpace += 20;
         }
-        ySpace = 700
-
-        for (j = 40; j > 0; j--) {
-
-
-          this.wallArray.push({
-            x: xSpace,
-            y: ySpace,
-            tileID: "wallTile#:" + id
-          });
-          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
-
-          id++;
         xSpace += 20;
-        }
+      }
+
+        
+      },
+
+      generateSteps(){
+
+        this.stepArray.push({x: 100, y:300,});
+        this.stepArray.push({x: 160, y:300,});
+        this.stepArray.push({x: 240, y:300,});
+        this.stepArray.push({x: 220, y:280,});
+        this.stepArray.push({x: 100, y:180,});
+        this.stepArray.push({x: 100, y:180,});
+
       },
 
 
@@ -205,7 +228,7 @@ export default {
             y: ySpace,
             tileID: "waterTile#:" + id
           });
-          this.boundariesArray.push({x: xSpace, y: ySpace, tileID: "boarder#:" + id })
+          this.boundariesArray.push({x: xSpace, y: ySpace, type: "water", tileID: "boarder#:" + id })
           xSpace += 20;
           id++;
         }
