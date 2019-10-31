@@ -220,6 +220,10 @@ export default {
 
     this.characterSpeech.x = this.CharacterInfo.x + 18;
     this.characterSpeech.y = this.CharacterInfo.y - 10;
+     this.interval = setInterval(() => {
+          this.whereIAm();
+
+        }, 110);
   },
   computed: {},
 
@@ -563,7 +567,8 @@ export default {
         this.$emit("plantHere", {
           id: this.plantID,
           x: this.player.x,
-          y: this.player.y
+          y: this.player.y,
+          maturity: 'seed'
         });
         this.plantID++;
       } else if (plantFound || irrigatationFoundHere) {
@@ -576,7 +581,8 @@ export default {
         this.$emit("plantHere", {
           id: this.plantID,
           x: this.player.x,
-          y: this.player.y
+          y: this.player.y,
+          maturity: 'seed'
         });
         this.plantID++;
       }
@@ -678,6 +684,11 @@ export default {
           clearInterval(this.interval);
         }, 3000);
       }
+    },
+
+    whereIAm(){
+       this.$emit("playerLocation", {x:this.player.x, y:this.player.y})
+
     }
   }
 };

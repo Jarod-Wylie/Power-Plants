@@ -2,6 +2,7 @@
   <div>
     <v-rect :config="square"></v-rect>
     <v-text :config="plant" />
+
   </div>
 </template>
 
@@ -9,7 +10,10 @@
 export default {
   name: "PlantTile",
   props: {
-    plantInfo: Object
+    plantInfo: Object,
+    plantArray: Array,
+    playerLocation: Object
+    // plantHarvest: Function,
   },
   data() {
     return {
@@ -30,9 +34,19 @@ export default {
         x: this.plantInfo.x,
         y: this.plantInfo.y,
         fontSize: 15,
-        text: " p",
+        text: ' p',
         stroke: "black"
-      }
+      },
+       harvestButton: {
+        x: 780,
+        y: 550,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        // fontSize: 15,
+        // text: "Harvest",
+        fill: "orange"
+      },
     };
   },
 
@@ -41,10 +55,6 @@ export default {
     console.log("maturity:", this.maturity);
 
     this.interval = setInterval(() => {
-      this.plant.x = this.plantInfo.x;
-      this.plant.y = this.plantInfo.y;
-      this.square.x = this.plantInfo.x;
-      this.square.y = this.plantInfo.y;
       this.growPlant();
     }, 10000);
 
@@ -55,26 +65,28 @@ export default {
   },
 
   methods: {
+
     growPlant() {
       this.count += 1;
 
       switch(this.count){
         case 10:
-          this.maturity = "seedling";
+          this.plant.maturity = "seedling";
           this.plant.stroke = "green";
+
           // console.log("seedling count:", this.count);
           break;
           
         case 20:
-          this.maturity = "mature";
+          this.plant.maturity = "mature";
           this.plant.fontSize = 30;
           break;
         case 25:
-          this.maturity = "ideal";
+          this.plant.maturity = "ideal";
           this.plant.stroke = "yellow"
           break;
         case 29:
-          this.maturity = "dead";
+          this.plant.maturity = "dead";
           this.plant.stroke = "black";
           this.plant.fontSize = 10;
           this.plant.text = "X";
@@ -87,6 +99,7 @@ export default {
       // console.log("interval:", this.count);
       
     }
+
   }
 };
 </script>
