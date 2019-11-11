@@ -23,6 +23,9 @@ export default {
         fill: "#477DEF",
         stroke: "#477DEF",
         strokeWidth: 1,
+        // shadowOffsetX: 5,
+        // shadowOffsetY: 5,
+        // shadowBlur: 10,
       },
       }
   },

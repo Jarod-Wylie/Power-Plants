@@ -22,6 +22,9 @@ export default {
         fill: "grey",
         stroke: "black",
         strokeWidth: 1,
+        shadowOffsetX: 5,
+        shadowOffsetY: 5,
+        shadowBlur: 10,
       },
       }
   },

@@ -1,3 +1,6 @@
+<!-------------------------------------------------
+--------------TEMPLATE -----------------------------------------
+----------------------------->
 <template>
   <div>
     <!-- Player Location -->
@@ -26,6 +29,13 @@
     <v-circle @click="irrigate()" :config="Irrigate" />
     <v-rect @click="harvest()" :config="Harvest" />
 
+    <!-- Build Actions -->
+    <v-rect @click="buildT()" :config="BuildButtonTop" />
+    <v-rect @click="buildB()" :config="BuildButtonBottom" />
+    <v-rect @click="buildL()" :config="BuildButtonLeft" />
+    <v-rect @click="buildR()" :config="BuildButtonRight" />
+    <v-circle :config="loading"/>
+
     <!-- Social Actions -->
     <v-circle @click="talk()" :config="talkButton" />
 
@@ -40,11 +50,19 @@
   </div>
 </template>
 
+<!-- ******************************************************************
+              SCRIPT
+************************************************************** -->
+
 <script>
+//  ******************************************************************
+//               DEPENDENCIES
+// ************************************************************** 
 import Character from "./Character.vue";
 import Enemy from "./Enemy.vue";
 
 export default {
+
   name: "Player",
   components: {
     Enemy: Enemy,
@@ -59,6 +77,9 @@ export default {
     plantArray: Array,
     steps: Array
   },
+//  ******************************************************************
+//               DATA
+// ************************************************************** 
   data() {
     return {
       interval: null,
@@ -98,6 +119,10 @@ export default {
         text: "/////////////////",
         stroke: "green"
       },
+
+//  ******************************************************************
+//               CONTROLL BUTTONS
+// ************************************************************** 
       upButton: {
         x: 780,
         y: 390,
@@ -173,7 +198,45 @@ export default {
         stroke: "black",
         text: "Plant"
       },
-
+      // Build Buttons
+      BuildButtonTop: {
+        x: 780,
+        y: 590,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        fill: "grey"
+      },
+      BuildButtonBottom: {
+        x: 780,
+        y: 660,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        fill: "grey"
+      },
+      BuildButtonLeft: {
+        x: 680,
+        y: 620,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        fill: "grey"
+      },
+      BuildButtonRight: {
+        x: 880,
+        y: 620,
+        height: 30,
+        width: 90,
+        stroke: "black",
+        fill: "grey"
+      },
+      loading: {
+        x: 210,
+        y: 410,
+        radius: 10,
+        fill: 'blue',
+      },
       Harvest: {
         x: 780,
         y: 550,
@@ -227,6 +290,9 @@ export default {
   },
   computed: {},
 
+//  ******************************************************************
+//               METHODS
+// ************************************************************** 
   methods: {
     moveUp() {
       if (this.player.y != this.Perimeter.yUp) {
@@ -237,9 +303,22 @@ export default {
         );
           // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
           if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
+            if (boundaryFound.type == "water" ) {
+
+              var wallFound = this.playerBoundaries.find(
+              playerBoundaries =>
+              playerBoundaries.x == this.player.x &&
+              playerBoundaries.y + 20 == this.player.y &&
+              playerBoundaries.type == 'wall');
+
+              if(wallFound && this.playerLevel == true){
+                console.log("A wall has been found.")
+                return this.player.y -= 20
+              }
+              else {
+                return "Block: invalid boundary type: water";
+              }
+            }
           }
 
         var stepFound = this.steps.find(
@@ -295,16 +374,24 @@ export default {
             playerBoundaries.y - 20 == this.player.y
         );
 
-         if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
-          }
          // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
-          if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
+         if(boundaryFound){
+            if (boundaryFound.type == "water" ) {
+
+              var wallFound = this.playerBoundaries.find(
+              playerBoundaries =>
+              playerBoundaries.x == this.player.x &&
+              playerBoundaries.y - 20 == this.player.y &&
+              playerBoundaries.type == 'wall');
+
+              if(wallFound && this.playerLevel == true){
+                console.log("A wall has been found.")
+                return this.player.y += 20
+              }
+              else {
+                return "Block: invalid boundary type: water";
+              }
+            }
           }
 
         var stepFound = this.steps.find(
@@ -357,19 +444,26 @@ export default {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
             playerBoundaries.x - 20 == this.player.x &&
-            playerBoundaries.y == this.player.y
-        );
+            playerBoundaries.y == this.player.y);
 
-         if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
-          }
         // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
-          if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
+         if(boundaryFound){
+            if (boundaryFound.type == "water" ) {
+
+              var wallFound = this.playerBoundaries.find(
+              playerBoundaries =>
+              playerBoundaries.x - 20 == this.player.x &&
+              playerBoundaries.y == this.player.y &&
+              playerBoundaries.type == 'wall');
+
+              if(wallFound && this.playerLevel == true){
+                console.log("A wall has been found.")
+                return this.player.x += 20
+              }
+              else {
+                return "Block: invalid boundary type: water";
+              }
+            }
           }
 
         var stepFound = this.steps.find(
@@ -421,19 +515,27 @@ export default {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
             playerBoundaries.x + 20 == this.player.x &&
-            playerBoundaries.y == this.player.y
-        );
-         if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
-          }
+            playerBoundaries.y == this.player.y);
+
 
         // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
           if(boundaryFound){
-            if (boundaryFound.type == "water") {
-              return "Block: invalid boundary type: water";
-          }
+            if (boundaryFound.type == "water" ) {
+
+              var wallFound = this.playerBoundaries.find(
+              playerBoundaries =>
+              playerBoundaries.x + 20 == this.player.x &&
+              playerBoundaries.y == this.player.y &&
+              playerBoundaries.type == 'wall');
+
+              if(wallFound && this.playerLevel == true){
+                console.log("A wall has been found.")
+                return this.player.x -= 20
+              }
+              else {
+                return "Block: invalid boundary type: water";
+              }
+            }
           }
 
         var stepFound = this.steps.find(
@@ -494,14 +596,65 @@ export default {
 
       if (
         this.player.x == this.HomeInfo.x &&
-        this.player.y == this.HomeInfo.y
+        this.player.y == this.HomeInfo.y 
       ) {
-        this.energy.text = "//////////////";
+        this.energy.text = "///////////////////////////////////////////////";
       }
 
       // if(str.length == 0){
       //   alert("Players has died of fatigue")
       // }
+    },
+    // Construction methods
+    buildT(){
+       this.loading.x = this.player.x
+        this.loading.y = this.player.y - 20
+
+      setTimeout(function(){
+      console.log('after');
+      this.$emit("buildHere", {
+          x: this.player.x,
+          y: this.player.y - 20,
+          type:'wall'          
+        });
+      },9);
+
+      // this.interval = setInterval(() => {
+       
+      // }, 100000);
+
+      // clearInterval(this.interval);
+
+       this.$emit("buildHere", {
+          x: this.player.x,
+          y: this.player.y - 20,
+          type:'wall'          
+        });
+
+    },
+    buildB(){
+       this.$emit("buildHere", {
+          x: this.player.x ,
+          y: this.player.y + 20,
+          type:'wall'          
+        });
+
+    },
+    buildL(){
+       this.$emit("buildHere", {
+          x: this.player.x - 20,
+          y: this.player.y,
+          type:'wall'          
+        });
+
+    },
+    buildR(){
+       this.$emit("buildHere", {
+          x: this.player.x + 20,
+          y: this.player.y,
+          type:'wall'          
+        });
+
     },
 
     // Horticulture methods

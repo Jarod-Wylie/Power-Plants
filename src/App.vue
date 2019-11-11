@@ -52,6 +52,7 @@
         :steps="stepArray"
 
         @irrigateHere="irrigate"
+        @buildHere="build"
         @plantHere="plant"
         @harvestHere="harvest"
         @playerLocation="set"
@@ -202,6 +203,31 @@ export default {
         }
         xSpace += 20;
       }
+
+      xSpace = 500
+      ySpace = 100
+for (i = 6; i > 0; i--) {
+        ySpace = 200;
+
+        for (j = 5; j > 0; j--) {
+          this.wallArray.push({
+            x: xSpace,
+            y: ySpace,
+            tileID: "wallTile#:" + id
+          });
+          this.boundariesArray.push({
+            x: xSpace,
+            y: ySpace,
+            tileID: "boarder#:" + id
+          });
+
+          id++;
+          ySpace += 20;
+        }
+        xSpace += 20;
+      }
+      
+     
     },
 
     generateSteps() {
@@ -209,6 +235,7 @@ export default {
       this.stepArray.push({ x: 160, y: 300 , id:2});
 
       this.stepArray.push({ x: 220, y: 280, id:3 });
+      this.stepArray.push({ x: 660, y: 280, id:4 });
     },
 
     //
@@ -216,12 +243,12 @@ export default {
       var id = 0;
       var i = 20;
       var j = 20;
-      var ySpace = 240;
+      var ySpace = 120;
 
-      for (j = 5; j > 0; j--) {
+      for (j = 13; j > 0; j--) {
         var xSpace = 260;
 
-        for (i = 5; i > 0; i--) {
+        for (i = 20; i > 0; i--) {
           this.waterArray.push({
             x: xSpace,
             y: ySpace,
@@ -255,6 +282,12 @@ export default {
       this.plantArray.push(obj);
 
       console.log("plant Array:", this.plantArray);
+    },
+
+    build(obj){
+      this.wallArray.push(obj);
+      this.boundariesArray.push(obj);
+      console.log("building wall");
     },
 
     // Initiated when player emits harvestHere

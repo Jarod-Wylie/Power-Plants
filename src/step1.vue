@@ -27,7 +27,7 @@ export default {
         y: this.stepInfo.y,
         height: 20,
         width: 20,
-        fill: "orange",
+        fill: "#FDFDFF",
         stroke: "black",
         strokeWidth: 1,
       },
