@@ -23,6 +23,7 @@ export default {
         fill: "#477DEF",
         stroke: "#477DEF",
         strokeWidth: 1,
+        listen: false
       },
       }
   },

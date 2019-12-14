@@ -2,7 +2,10 @@
 
 <template>
   <div>
+    <v-group>
     <v-rect :config="tile"></v-rect>
+    <v-rect :config="raised"></v-rect>
+    </v-group>
   </div>
 </template>
 
@@ -21,16 +24,35 @@ export default {
         width: 20,
         fill: "grey",
         stroke: "black",
+        // strokeWidth: 1,
+        // shadowOffsetX: 5,
+        // shadowOffsetY: 10,
+        // shadowBlur: 10,
+        listen: false,
+      },
+
+      raised: {
+        x: this.wallInfo.x,
+        y: this.wallInfo.y + 20,
+        height: 16,
+        width: 20,
+        fill: "#535557",
+        stroke: "black",
+        strokeWidth: 1,
         strokeWidth: 1,
         shadowOffsetX: 5,
-        shadowOffsetY: 5,
-        shadowBlur: 10,
+
+        shadowBlur: 5,
+        listen: false,
       },
+
+
       }
   },
 
   mounted() {
-    console.log("BoundaryTile Mounted");
+
+
   }
 };
 </script>

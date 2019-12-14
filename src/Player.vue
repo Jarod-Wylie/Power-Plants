@@ -1,10 +1,10 @@
-<!-------------------------------------------------
---------------TEMPLATE -----------------------------------------
------------------------------>
+<!--------------------------------------------------------------------------------------------
+ ---------------------------------------TEMPLATE ---------------------------------------------
+--------------------------------------------------------------------------------------------->
 <template>
-  <div>
+  <div id="container" tabindex="0" @keyup.right="moveUp()">
     <!-- Player Location -->
-    <v-text :config="PlayerLog" />
+    <!-- <v-text :config="PlayerLog" /> -->
 
     <!-- Player Energy bar -->
     <v-text :config="energy" />
@@ -12,7 +12,7 @@
     <!-- Actions players can take -->
 
     <!-- Directions -->
-    <v-rect @click="moveUp()" :config="upButton" />
+    <!-- <v-rect @click="moveUp()"  :config="upButton" />
     <v-text @click="moveUp()" :config="Up" />
 
     <v-rect @click="moveDown()" :config="downButton" />
@@ -22,25 +22,25 @@
     <v-text @click="moveRight()" :config="Right" />
 
     <v-rect @click="moveLeft()" :config="leftButton" />
-    <v-text @keyup.left="moveLeft()" @click="moveLeft()" :config="Left" />
+    <v-text @keyup.left="moveLeft()" @click="moveLeft()" :config="Left" /> -->
 
     <!-- Farming Actions -->
-    <v-circle @click="plant()" :config="Plant" />
-    <v-circle @click="irrigate()" :config="Irrigate" />
-    <v-rect @click="harvest()" :config="Harvest" />
+    <!-- <v-circle @click="plant()" :config="Plant" /> -->
+    <!-- <v-circle @click="irrigate()" :config="Irrigate" />
+    <v-rect @click="harvest()" :config="Harvest" /> -->
 
     <!-- Build Actions -->
-    <v-rect @click="buildT()" :config="BuildButtonTop" />
+    <!-- <v-rect @click="buildT()" :config="BuildButtonTop" />
     <v-rect @click="buildB()" :config="BuildButtonBottom" />
     <v-rect @click="buildL()" :config="BuildButtonLeft" />
     <v-rect @click="buildR()" :config="BuildButtonRight" />
-    <v-circle :config="loading"/>
+    <v-circle :config="loading"/> -->
 
     <!-- Social Actions -->
-    <v-circle @click="talk()" :config="talkButton" />
+    <!-- <v-circle @click="talk()" :config="talkButton" /> -->
 
     <!-- <v-rect :config="playerShadow"/> -->
-    <v-text :config="player" />
+    <v-text :config="player" ref="player"/>
 
     <!-- Characters and Enemies -->
     <enemy></enemy>
@@ -50,14 +50,16 @@
   </div>
 </template>
 
-<!-- ******************************************************************
-              SCRIPT
-************************************************************** -->
+
 
 <script>
-//  ******************************************************************
-//               DEPENDENCIES
-// ************************************************************** 
+//  ******************************************************************************************************************************
+//                                                   SCRIPT
+// *******************************************************************************************************************************
+
+//  ******************************************************************************************************************************
+//                                                 DEPENDENCIES
+// *******************************************************************************************************************************
 import Character from "./Character.vue";
 import Enemy from "./Enemy.vue";
 
@@ -66,7 +68,7 @@ export default {
   name: "Player",
   components: {
     Enemy: Enemy,
-    Character: Character
+    // Character: Character
   },
   props: {
     HomeInfo: Object,
@@ -75,43 +77,48 @@ export default {
     waterArray: Array,
     irrigationArray: Array,
     plantArray: Array,
-    steps: Array
+    steps: Array,
+    hoeArray: Array,
+
+    inventoryArray: Array,
   },
-//  ******************************************************************
-//               DATA
-// ************************************************************** 
+// *******************************************************************************************************************************
+//                                                       DATA
+// *******************************************************************************************************************************
   data() {
     return {
       interval: null,
+      filters:[Konva.Filters.Blur],
       plantID: 0,
 
+
+// ****************************              PLAYER SETTINGS
       playerBoundaries: this.boundaries,
 
       player: {
-        x: this.HomeInfo.x,
+        x: this.HomeInfo.x + 20,
         y: this.HomeInfo.y,
         fontSize: 25,
         text: "\u0FC7",
-        fill: "#EF4700"
+        fill: "#EF4700",
+        // shadowBlur: 10,
+        filters: this.filters,
+        blur:200
       },
+
+      offSet: 20, // --- off sets player image to look more center to tile
 
       playerLevel: false,
       onPlatform: false,
       
+      // playerShadow: { 
+      //   x: this.HomeInfo.x,
+      //   y: this.HomeInfo.y,
+      //   height: 20,
+      //   width: 20,
+      //   fill: "#7C736D"
+      // },
 
-      playerShadow: {
-        x: this.HomeInfo.x,
-        y: this.HomeInfo.y,
-        height: 20,
-        width: 20,
-        fill: "#7C736D"
-      },
-      PlayerLog: {
-        x: 100,
-        y: 40,
-        fontSize: 30,
-        text: "cao"
-      },
       energy: {
         x: 200,
         y: 550,
@@ -120,9 +127,7 @@ export default {
         stroke: "green"
       },
 
-//  ******************************************************************
-//               CONTROLL BUTTONS
-// ************************************************************** 
+// ****************************              CONTROLL BUTTONS
       upButton: {
         x: 780,
         y: 390,
@@ -182,107 +187,42 @@ export default {
         text: ""
       },
 
-      Plant: {
-        x: 810,
-        y: 460,
-        radius: 25,
-        fill: "green",
-        stroke: "black",
-        text: "Plant"
-      },
-      Irrigate: {
-        x: 910,
-        y: 550,
-        radius: 25,
-        fill: "#477DEF",
-        stroke: "black",
-        text: "Plant"
-      },
-      // Build Buttons
-      BuildButtonTop: {
-        x: 780,
-        y: 590,
-        height: 30,
-        width: 90,
-        stroke: "black",
-        fill: "grey"
-      },
-      BuildButtonBottom: {
-        x: 780,
-        y: 660,
-        height: 30,
-        width: 90,
-        stroke: "black",
-        fill: "grey"
-      },
-      BuildButtonLeft: {
-        x: 680,
-        y: 620,
-        height: 30,
-        width: 90,
-        stroke: "black",
-        fill: "grey"
-      },
-      BuildButtonRight: {
-        x: 880,
-        y: 620,
-        height: 30,
-        width: 90,
-        stroke: "black",
-        fill: "grey"
-      },
-      loading: {
-        x: 210,
-        y: 410,
-        radius: 10,
-        fill: 'blue',
-      },
-      Harvest: {
-        x: 780,
-        y: 550,
-        height: 30,
-        width: 90,
-        stroke: "black",
-        // fontSize: 15,
-        // text: "Harvest",
-        fill: "orange"
-      },
+      
 
-      talkButton: {
-        x: 910,
-        y: 400,
-        radius: 25,
-        fill: "red",
-        stroke: "black"
-      },
+      // ****************************                 dCHARACTER DATA
+      // CharacterInfo: {
+      //   x: 200,
+      //   y: 520,
+      //   name: "Rich Hoagie",
+      //   replies: [
+      //     "",
+      //     "I am not feeling very well today.",
+      //     "Maybe I'll find time to fix the tank some time this week."
+      //   ]
+      // },
 
-      // Character Data
-      CharacterInfo: {
-        x: 300,
-        y: 460,
-        name: "Rich Hoagie",
-        replies: [
-          "",
-          "I am not feeling very well today.",
-          "Maybe I'll find time to fix the tank some time this week."
-        ]
-      },
-      characterSpeech: {
-        x: null,
-        y: null,
-        stroke: "Black",
-        fontSize: 20,
-        text: ""
-      }
     };
   },
+// *******************************************************************************************************************************
+//                                             BOTTOM OF DATA
+// *******************************************************************************************************************************
+
+  created() {
+
+    this.player.onload = () => {
+      this.$nextTick(() => {
+        const node = this.$refs.player.getStage();
+        node.cache();
+        node.getLayer().batchDraw();
+      })
+  }
+  },
   mounted() {
-    this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+    console.log('player Z', this.player)
+    // this.playerBoundaries.push(this.CharacterInfo);
 
-    this.playerBoundaries.push(this.CharacterInfo);
-
-    this.characterSpeech.x = this.CharacterInfo.x + 18;
-    this.characterSpeech.y = this.CharacterInfo.y - 10;
+    // this.characterSpeech.x = this.CharacterInfo.x + 18;
+    // this.characterSpeech.y = this.CharacterInfo.y - 10;
      this.interval = setInterval(() => {
           this.whereIAm();
 
@@ -290,16 +230,20 @@ export default {
   },
   computed: {},
 
-//  ******************************************************************
-//               METHODS
-// ************************************************************** 
+
+
+// *******************************************************************************************************************************
+//                                                       METHODS
+// *******************************************************************************************************************************
   methods: {
+
+    // ****************************              PLAYER MOVEMENT
     moveUp() {
       if (this.player.y != this.Perimeter.yUp) {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
             playerBoundaries.x == this.player.x &&
-            playerBoundaries.y + 20 == this.player.y
+            playerBoundaries.y + this.offSet == this.player.y
         );
           // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
           if(boundaryFound){
@@ -308,12 +252,13 @@ export default {
               var wallFound = this.playerBoundaries.find(
               playerBoundaries =>
               playerBoundaries.x == this.player.x &&
-              playerBoundaries.y + 20 == this.player.y &&
+              playerBoundaries.y + this.offSet == this.player.y &&
               playerBoundaries.type == 'wall');
 
-              if(wallFound && this.playerLevel == true){
+              if(wallFound && this.playerLevel != false){
                 console.log("A wall has been found.")
-                return this.player.y -= 20
+                this.playerLevel = true;
+                return this.player.y -= this.offSet
               }
               else {
                 return "Block: invalid boundary type: water";
@@ -322,11 +267,11 @@ export default {
           }
 
         var stepFound = this.steps.find(
-          steps => steps.x == this.player.x && steps.y + 20 == this.player.y
+          steps => steps.x == this.player.x && steps.y + this.offSet == this.player.y
         );
 
         if (stepFound) {
-          this.player.y -= 20
+          this.player.y -= this.offSet
           this.playerLevel = null
           console.log("stepFound:", this.playerLevel);
           return null
@@ -337,8 +282,8 @@ export default {
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.y -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.y -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
           console.log("On Platform:", this.playerLevel);
           console.log("level 2");
@@ -350,8 +295,8 @@ export default {
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
           this.subtractEnergy();
-          // this.player.y -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          // this.player.y -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
         }
 
@@ -361,8 +306,8 @@ export default {
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.y -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.y -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
     },
@@ -371,7 +316,7 @@ export default {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
             playerBoundaries.x == this.player.x &&
-            playerBoundaries.y - 20 == this.player.y
+            playerBoundaries.y - this.offSet == this.player.y
         );
 
          // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
@@ -381,12 +326,13 @@ export default {
               var wallFound = this.playerBoundaries.find(
               playerBoundaries =>
               playerBoundaries.x == this.player.x &&
-              playerBoundaries.y - 20 == this.player.y &&
+              playerBoundaries.y - this.offSet == this.player.y &&
               playerBoundaries.type == 'wall');
 
-              if(wallFound && this.playerLevel == true){
+              if(wallFound && this.playerLevel != false){
                 console.log("A wall has been found.")
-                return this.player.y += 20
+                this.playerLevel = true;
+                return this.player.y += this.offSet
               }
               else {
                 return "Block: invalid boundary type: water";
@@ -395,11 +341,11 @@ export default {
           }
 
         var stepFound = this.steps.find(
-          steps => steps.x == this.player.x && steps.y - 20 == this.player.y
+          steps => steps.x == this.player.x && steps.y - this.offSet == this.player.y
         );
 
         if (stepFound) {
-           this.player.y += 20
+           this.player.y += this.offSet
           this.playerLevel = null
           console.log("stepFound:", this.playerLevel);
           return null
@@ -410,8 +356,8 @@ export default {
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.y += 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.y += this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
           console.log("On Platform:", this.playerLevel);
           console.log("level 2");
@@ -423,8 +369,8 @@ export default {
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
           this.subtractEnergy();
-          // this.player.y -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          // this.player.y -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
         }
 
@@ -434,8 +380,8 @@ export default {
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.y += 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.y += this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
     },
@@ -443,7 +389,7 @@ export default {
       if (this.player.x != this.Perimeter.xRight) {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
-            playerBoundaries.x - 20 == this.player.x &&
+            playerBoundaries.x - this.offSet == this.player.x &&
             playerBoundaries.y == this.player.y);
 
         // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
@@ -452,13 +398,14 @@ export default {
 
               var wallFound = this.playerBoundaries.find(
               playerBoundaries =>
-              playerBoundaries.x - 20 == this.player.x &&
+              playerBoundaries.x - this.offSet == this.player.x &&
               playerBoundaries.y == this.player.y &&
               playerBoundaries.type == 'wall');
 
-              if(wallFound && this.playerLevel == true){
-                console.log("A wall has been found.")
-                return this.player.x += 20
+              if(wallFound && this.playerLevel != false){
+                console.log("A wall has been found.:",this.playerLevel)
+                this.playerLevel = true;
+                return this.player.x += this.offSet
               }
               else {
                 return "Block: invalid boundary type: water";
@@ -467,11 +414,11 @@ export default {
           }
 
         var stepFound = this.steps.find(
-          steps => steps.x - 20 == this.player.x && steps.y == this.player.y
+          steps => steps.x - this.offSet == this.player.x && steps.y == this.player.y
         );
 
         if (stepFound) {
-           this.player.x += 20
+           this.player.x += this.offSet
           this.playerLevel = null
           console.log("stepFound:", this.playerLevel);
           return null
@@ -482,8 +429,8 @@ export default {
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.x += 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.x += this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
           console.log("On Platform:", this.playerLevel);
           console.log("level 2");
@@ -495,7 +442,7 @@ export default {
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
           this.subtractEnergy();
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
         }
 
@@ -505,8 +452,8 @@ export default {
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.x += 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.x += this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
     },
@@ -514,23 +461,24 @@ export default {
       if (this.player.x != this.Perimeter.xLeft) {
         var boundaryFound = this.playerBoundaries.find(
           playerBoundaries =>
-            playerBoundaries.x + 20 == this.player.x &&
+            playerBoundaries.x + this.offSet == this.player.x &&
             playerBoundaries.y == this.player.y);
 
 
-        // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
+          // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
           if(boundaryFound){
             if (boundaryFound.type == "water" ) {
 
               var wallFound = this.playerBoundaries.find(
               playerBoundaries =>
-              playerBoundaries.x + 20 == this.player.x &&
+              playerBoundaries.x + this.offSet == this.player.x &&
               playerBoundaries.y == this.player.y &&
               playerBoundaries.type == 'wall');
 
-              if(wallFound && this.playerLevel == true){
+              if(wallFound && this.playerLevel != false){
                 console.log("A wall has been found.")
-                return this.player.x -= 20
+                this.playerLevel = true;
+                return this.player.x -= this.offSet
               }
               else {
                 return "Block: invalid boundary type: water";
@@ -539,11 +487,11 @@ export default {
           }
 
         var stepFound = this.steps.find(
-          steps => steps.x + 20 == this.player.x && steps.y == this.player.y
+          steps => steps.x + this.offSet == this.player.x && steps.y == this.player.y
         );
 
         if (stepFound) {
-           this.player.x -= 20
+           this.player.x -= this.offSet
           this.playerLevel = null
           console.log("stepFound:", this.playerLevel);
           return null
@@ -554,8 +502,8 @@ export default {
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.x -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.x -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
           console.log("On Platform:", this.playerLevel);
           console.log("level 2");
@@ -567,8 +515,8 @@ export default {
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
           this.subtractEnergy();
-          // this.player.y -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          // this.player.y -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
         }
 
@@ -578,56 +526,41 @@ export default {
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
           this.subtractEnergy();
-          this.player.x -= 20;
-          this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
+          this.player.x -= this.offSet;
+          // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
       }
     },
+    // ****************************              BOTTOM OF PLAYER MOVEMENT METHODS
 
-    // Player Status Functions
+
+    // ****************************                  PLAYER STATUS FUNCTIONS
 
     subtractEnergy() {
       var str = this.energy.text;
+        if (
+          this.player.x == this.HomeInfo.x &&
+          this.player.y == this.HomeInfo.y 
+        ) {
+          this.$emit("inside")
+          this.energy.text = "///////////////////////////////////////////////";
+        }
       this.energy.text = str.substring(0, str.length - 1);
-
       if (str.length < str.length / 2) {
         this.energy.stroke = "yellow";
       }
-
-      if (
-        this.player.x == this.HomeInfo.x &&
-        this.player.y == this.HomeInfo.y 
-      ) {
-        this.energy.text = "///////////////////////////////////////////////";
-      }
-
       // if(str.length == 0){
       //   alert("Players has died of fatigue")
       // }
     },
-    // Construction methods
+
+    // ****************************              CONSTRUCTION METHODS
     buildT(){
-       this.loading.x = this.player.x
-        this.loading.y = this.player.y - 20
 
-      setTimeout(function(){
-      console.log('after');
-      this.$emit("buildHere", {
-          x: this.player.x,
-          y: this.player.y - 20,
-          type:'wall'          
-        });
-      },9);
-
-      // this.interval = setInterval(() => {
-       
-      // }, 100000);
-
-      // clearInterval(this.interval);
 
        this.$emit("buildHere", {
           x: this.player.x,
-          y: this.player.y - 20,
+          y: this.player.y - this.offSet,
           type:'wall'          
         });
 
@@ -635,14 +568,14 @@ export default {
     buildB(){
        this.$emit("buildHere", {
           x: this.player.x ,
-          y: this.player.y + 20,
+          y: this.player.y + this.offSet,
           type:'wall'          
         });
 
     },
     buildL(){
        this.$emit("buildHere", {
-          x: this.player.x - 20,
+          x: this.player.x - this.offSet,
           y: this.player.y,
           type:'wall'          
         });
@@ -650,39 +583,53 @@ export default {
     },
     buildR(){
        this.$emit("buildHere", {
-          x: this.player.x + 20,
+          x: this.player.x + this.offSet,
           y: this.player.y,
           type:'wall'          
         });
 
     },
+// ****************************              BOTTOM OF CONSTRUCTION METHODS
 
-    // Horticulture methods
+
+// ****************************                      GRAB METHODS
+
+grab(){
+  var itemFound = (itemFound = this.hoeArray.find(
+    item => (item.x == this.player.x && item.y == this.player.y)
+  ))
+
+  if (itemFound){
+    this.$emit('pickUpItem', {itemFound})
+  }
+},
+
+// ****************************                   AGRICULTURE METHODS
     plant() {
       var plantFound = (plantFound = this.plantArray.find(
         plant =>
           (plant.x == this.player.x && plant.y == this.player.y) ||
-          (plant.x == this.player.x + 20 && plant.y == this.player.y) ||
-          (plant.x == this.player.x - 20 && plant.y == this.player.y) ||
-          (plant.x == this.player.x && plant.y == this.player.y + 20) ||
-          (plant.x == this.player.x && plant.y == this.player.y - 20) ||
-          (plant.x == this.player.x + 20 && plant.y == this.player.y - 20) ||
-          (plant.x == this.player.x - 20 && plant.y == this.player.y + 20) ||
-          (plant.x == this.player.x + 20 && plant.y == this.player.y + 20) ||
-          (plant.x == this.player.x - 20 && plant.y == this.player.y - 20)
+          (plant.x == this.player.x + this.offSet && plant.y == this.player.y) ||
+          (plant.x == this.player.x - this.offSet && plant.y == this.player.y) ||
+          (plant.x == this.player.x && plant.y == this.player.y + this.offSet) ||
+          (plant.x == this.player.x && plant.y == this.player.y - this.offSet) ||
+          (plant.x == this.player.x + this.offSet && plant.y == this.player.y - this.offSet) ||
+          (plant.x == this.player.x - this.offSet && plant.y == this.player.y + this.offSet) ||
+          (plant.x == this.player.x + this.offSet && plant.y == this.player.y + this.offSet) ||
+          (plant.x == this.player.x - this.offSet && plant.y == this.player.y - this.offSet)
       ));
 
       var waterFoundLeft = this.waterArray.find(
-        water => water.x + 20 == this.player.x && water.y == this.player.y
+        water => water.x + this.offSet == this.player.x && water.y == this.player.y
       );
       var waterFoundRight = this.waterArray.find(
-        water => water.x - 20 == this.player.x && water.y == this.player.y
+        water => water.x - this.offSet == this.player.x && water.y == this.player.y
       );
       var waterFoundUp = this.waterArray.find(
-        water => water.x == this.player.x && water.y + 20 == this.player.y
+        water => water.x == this.player.x && water.y + this.offSet == this.player.y
       );
       var waterFoundDown = this.waterArray.find(
-        water => water.x == this.player.x && water.y - 20 == this.player.y
+        water => water.x == this.player.x && water.y - this.offSet == this.player.y
       );
 
       var irrigatationFoundHere = this.irrigationArray.find(
@@ -690,16 +637,16 @@ export default {
       );
 
       var irrigatationFoundLeft = this.irrigationArray.find(
-        water => water.x + 20 == this.player.x && water.y == this.player.y
+        water => water.x + this.offSet == this.player.x && water.y == this.player.y
       );
       var irrigatationFoundRight = this.irrigationArray.find(
-        water => water.x - 20 == this.player.x && water.y == this.player.y
+        water => water.x - this.offSet == this.player.x && water.y == this.player.y
       );
       var irrigatationFoundUp = this.irrigationArray.find(
-        water => water.x == this.player.x && water.y + 20 == this.player.y
+        water => water.x == this.player.x && water.y + this.offSet == this.player.y
       );
       var irrigatationFoundDown = this.irrigationArray.find(
-        water => water.x == this.player.x && water.y - 20 == this.player.y
+        water => water.x == this.player.x && water.y - this.offSet == this.player.y
       );
 
       if (
@@ -742,30 +689,34 @@ export default {
     },
 
     irrigate() {
+      var hoeFound = this.inventoryArray.find(item => item)
+      console.log("hoeFound:", hoeFound)
+
+      if(hoeFound){
       var waterFoundLeft = this.waterArray.find(
-        water => water.x + 20 == this.player.x && water.y == this.player.y
+        water => water.x + this.offSet == this.player.x && water.y == this.player.y
       );
       var waterFoundRight = this.waterArray.find(
-        water => water.x - 20 == this.player.x && water.y == this.player.y
+        water => water.x - this.offSet == this.player.x && water.y == this.player.y
       );
       var waterFoundUp = this.waterArray.find(
-        water => water.x == this.player.x && water.y + 20 == this.player.y
+        water => water.x == this.player.x && water.y + this.offSet == this.player.y
       );
       var waterFoundDown = this.waterArray.find(
-        water => water.x == this.player.x && water.y - 20 == this.player.y
+        water => water.x == this.player.x && water.y - this.offSet == this.player.y
       );
 
       var irrigatationFoundLeft = this.irrigationArray.find(
-        water => water.x + 20 == this.player.x && water.y == this.player.y
+        water => water.x + this.offSet == this.player.x && water.y == this.player.y
       );
       var irrigatationFoundRight = this.irrigationArray.find(
-        water => water.x - 20 == this.player.x && water.y == this.player.y
+        water => water.x - this.offSet == this.player.x && water.y == this.player.y
       );
       var irrigatationFoundUp = this.irrigationArray.find(
-        water => water.x == this.player.x && water.y + 20 == this.player.y
+        water => water.x == this.player.x && water.y + this.offSet == this.player.y
       );
       var irrigatationFoundDown = this.irrigationArray.find(
-        water => water.x == this.player.x && water.y - 20 == this.player.y
+        water => water.x == this.player.x && water.y - this.offSet == this.player.y
       );
 
       if (
@@ -799,6 +750,8 @@ export default {
       } else {
         console.log("No water found.");
       }
+      }
+      else {console.log('No Hoe to dig with.')}
     },
     harvest() {
       if (
@@ -817,18 +770,19 @@ export default {
         console.log("plantArray", this.plantArray);
       }
     },
-    // End of Horticulture Methods
+// ****************************              BOTTOM OF AGRICULTURE METHODS
 
+// ****************************              SOCIAL METHODS
     talk() {
       if (
-        (this.player.x == this.CharacterInfo.x + 20 &&
+        (this.player.x == this.CharacterInfo.x + this.offSet &&
           this.player.y == this.CharacterInfo.y) ||
-        (this.player.x == this.CharacterInfo.x - 20 &&
+        (this.player.x == this.CharacterInfo.x - this.offSet &&
           this.player.y == this.CharacterInfo.y) ||
         (this.player.x == this.CharacterInfo.x &&
-          this.player.y == this.CharacterInfo.y + 20) ||
+          this.player.y == this.CharacterInfo.y + this.offSet) ||
         (this.player.x == this.CharacterInfo.x &&
-          this.player.y == this.CharacterInfo.y - 20)
+          this.player.y == this.CharacterInfo.y - this.offSet)
       ) {
         console.log("Talking to player");
         this.characterSpeech.text = this.CharacterInfo.replies[1];
@@ -841,8 +795,11 @@ export default {
 
     whereIAm(){
        this.$emit("playerLocation", {x:this.player.x, y:this.player.y})
-
     }
+
+// *******************************************************************************************************************************
+//                                                BOTTOM OF METHODS
+// *******************************************************************************************************************************
   }
 };
 </script>

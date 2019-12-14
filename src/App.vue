@@ -1,6 +1,36 @@
+<!--------------------------------------------------------------------------------------------
+ ---------------------------------------TEMPLATE ---------------------------------------------
+--------------------------------------------------------------------------------------------->
 <template>
-  <v-stage ref="stage" :config="configKonva">
-    <v-layer>
+ <div id="container" tabindex="0" 
+      @keydown.87.exact="moveUp()" 
+      @keydown.83.exact="moveDown()" 
+      @keydown.65.exact="moveLeft()"
+      @keydown.68.exact="moveRight()" 
+
+
+      @keydown.shift.87.exact="buildT()"
+      @keydown.shift.83.exact="buildB()"
+      @keydown.shift.65.exact="buildL()"
+      @keydown.shift.68.exact="buildR()"
+
+      @keyup.80="plantHere()"
+      @keyup.72="harvestHere()"
+      @keyup.71.exact="grab()"
+      @keyup.73="irrigateHere()"
+      @keyup.84="talkHere()"
+
+     
+      >
+  <v-stage ref="stage" :config="{
+        container: 'container',
+        x: 10,
+        y: 10,
+        width: 1200,
+        height: 700
+        }">
+    <v-fastLayer>
+
       <v-rect
         :config="{
             width: 2000,
@@ -38,40 +68,64 @@
         v-for="i in tileArray"
         :key="i.tileID"
       ></v-rect>
+    </v-fastLayer>
 
       <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
       <!-- <BoundaryTile></BoundaryTile> -->
+      <v-layer>
 
+
+<!--                                  PLAYER COMPONENT                                    -->
       <Player
+        ref="player" 
         :HomeInfo="HomeArray[0]"
         :Perimeter="Perimeter"
         :boundaries="boundariesArray"
         :plantArray="plantArray"
         :waterArray="waterArray"
         :irrigationArray="irrigationArray"
+        :hoeArray="hoeArray"
         :steps="stepArray"
+        :inventoryArray="inventoryArray"
 
         @irrigateHere="irrigate"
         @buildHere="build"
         @plantHere="plant"
         @harvestHere="harvest"
+        @pickUpItem="pickUpItem"
         @playerLocation="set"
       ></Player>
+                          <!-- BOTTOM OF PLAYER COMPONENT -->
+
+        <Character :CharacterInfo="CharacterInfo"></Character>
+        <v-text :config="characterSpeech" />
 
       <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
-
       <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
       <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
       <PlantTile v-for="i in plantArray" :key="i" :plantInfo="i" :plantArray="plantArray"></PlantTile>
       <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
-      <step1 v-for="i in stepArray" :key="i" :stepInfo="i"></step1>
+      <step1  v-for="i in stepArray" :key="i.id" :stepInfo="i"></step1>
+      <Hoe  v-for="i in hoeArray" :key="i.id" :hoeInfo="i"></Hoe>
 
       <!-- <Enemy></Enemy> -->
+
+
     </v-layer>
   </v-stage>
+  </div>
 </template>
 
+
 <script>
+//  ******************************************************************************************************************************
+//                                                   SCRIPT
+// *******************************************************************************************************************************
+
+
+//  ******************************************************************************************************************************
+//                                                 DEPENDENCIES
+// *******************************************************************************************************************************
 import Tile from "./Tile.vue";
 import Player from "./Player.vue";
 import BoundaryTile from "./BoundaryTile.vue";
@@ -80,7 +134,14 @@ import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
 import HomeTile from "./HomeTile.vue";
 import step1 from "./step1.vue";
+import Character from "./Character.vue";
+import Hoe from "./Hoe.vue";
 
+
+
+// *******************************************************************************************************************************
+//                                                     DATA
+// *******************************************************************************************************************************
 export default {
   components: {
     Tile: Tile,
@@ -90,7 +151,9 @@ export default {
     PlantTile: PlantTile,
     waterTile: waterTile,
     irrigationTile: irrigationTile,
-    step1: step1
+    step1: step1,
+    Character: Character,
+    Hoe: Hoe,
   },
   data() {
     return {
@@ -104,6 +167,26 @@ export default {
       waterArray: [],
       irrigationArray: [],
       stepArray: [],
+      hoeArray: [],
+
+        // ****************************                 dCHARACTER DATA
+      CharacterInfo: {
+        x: 200,
+        y: 520,
+        name: "Rich Hoagie",
+        replies: [
+          "",
+          "I am not feeling very well today.",
+          "Maybe I'll find time to fix the tank some time this week."
+        ]
+      },
+      characterSpeech: {
+        x: 320,
+        y: 480,
+        stroke: "Black",
+        fontSize: 20,
+        text: ""
+      },
 
       food: 0,
       goal: {
@@ -113,30 +196,93 @@ export default {
         text: "/6"
       },
 
+      outside: true,
+
 
       tileObj: { x: 100, y: 100, tileID: 0 },
-      configKonva: {
-        width: 2000,
-        height: 2000
-      }
-    };
+
+    }
   },
-  mounted() {
+// *******************************************************************************************************************************
+//                                                BOTTOM OF DATA
+// *******************************************************************************************************************************
+  created(){
+    ;
+
+  },
+  mounted() {  // -----------------                   MOUNTED 
+//     var vm = this
+//     var container = vm.$refs.stage.$el
+//     container.focus();
+
+// console.log("stage:",vm.$refs.stage.$el)
+
+// console.log("stage2:", this.stage.container())
     this.generateGrid();
     this.generateBoundaries();
     this.generateSteps();
     this.generateWater();
+    this.itemsGenerator();
   },
 
-  methods: {
+// *******************************************************************************************************************************
+//                                                    METHODS
+// *******************************************************************************************************************************
+  methods: { 
+    moveUp(){
+      this.$refs.player.moveUp();
+      console.log("player!!!!:", this.$refs.player)
+    },
+    moveDown(){
+      this.$refs.player.moveDown();
+    },
+    moveLeft(){
+      this.$refs.player.moveLeft();
+    },
+    moveRight(){
+      this.$refs.player.moveRight();
+    },
+
+    buildT(){
+      this.$refs.player.buildT();
+    },
+    buildB(){
+      this.$refs.player.buildB();
+    },
+    buildL(){
+      this.$refs.player.buildL();
+    },
+    buildR(){
+      this.$refs.player.buildR();
+    },
+    grab(){
+      this.$refs.player.grab();
+    },
+    plantHere(){
+      this.$refs.player.plant();
+    },
+
+    irrigateHere(){
+      this.$refs.player.irrigate();
+    },
+    talkHere(){
+      this.$refs.player.talk();
+    },
+    harvestHere(){
+      this.$refs.player.harvest();
+    },
+
+
+
+    test(){
+      console.log("WORKRKRKRKRKWINGN")
+    },
     set(obj) {
       this.player = obj;
     },
-    // Build Area first
 
-    //
-    generateGrid() {
-      var id = 0;
+    generateGrid() { // -- Generates the basic perimeter and
+      var id = 0;    //    basic colored ground tiles
       var i = 20;
       var j = 20;
       var ySpace = 100;
@@ -148,7 +294,7 @@ export default {
         xSpace = 100;
 
         for (i = 40; i > 0; i--) {
-          this.tileArray.push({ x: xSpace, y: ySpace, tileID: id, show: "O" });
+          this.tileArray.push({ x: xSpace, y: ySpace, tileID: "grid#" + id, show: "O" });
           xSpace += 20;
           id++;
         }
@@ -158,10 +304,9 @@ export default {
       this.Perimeter.yDown = ySpace;
     },
 
-    //
-    generateBoundaries() {
-      var id = 0;
-      var i = 20;
+    generateBoundaries() { // -- Generated wall tiles and
+      var id = 0;          //    stores that positon in the
+      var i = 20;          //    boundaries array
       var j = 20;
       var xSpace = 100;
       var ySpace = 700;
@@ -206,7 +351,8 @@ export default {
 
       xSpace = 500
       ySpace = 100
-for (i = 6; i > 0; i--) {
+
+      for (i = 6; i > 0; i--) {
         ySpace = 200;
 
         for (j = 5; j > 0; j--) {
@@ -226,14 +372,11 @@ for (i = 6; i > 0; i--) {
         }
         xSpace += 20;
       }
-      
-     
     },
 
     generateSteps() {
       this.stepArray.push({ x: 100, y: 300, id:1 });
       this.stepArray.push({ x: 160, y: 300 , id:2});
-
       this.stepArray.push({ x: 220, y: 280, id:3 });
       this.stepArray.push({ x: 660, y: 280, id:4 });
     },
@@ -243,9 +386,9 @@ for (i = 6; i > 0; i--) {
       var id = 0;
       var i = 20;
       var j = 20;
-      var ySpace = 120;
+      var ySpace = 100;
 
-      for (j = 13; j > 0; j--) {
+      for (j = 20; j > 0; j--) {
         var xSpace = 260;
 
         for (i = 20; i > 0; i--) {
@@ -267,6 +410,10 @@ for (i = 6; i > 0; i--) {
       }
     },
 
+    itemsGenerator(){
+      this.hoeArray.push({x:200, y:200, id:'hoe' + 1, type:'hoe'});
+    },
+
     irrigate(obj) {
       console.log("irrigated", obj);
 
@@ -280,7 +427,7 @@ for (i = 6; i > 0; i--) {
       console.log("Planted", obj);
 
       this.plantArray.push(obj);
-
+d
       console.log("plant Array:", this.plantArray);
     },
 
@@ -288,6 +435,14 @@ for (i = 6; i > 0; i--) {
       this.wallArray.push(obj);
       this.boundariesArray.push(obj);
       console.log("building wall");
+    },
+
+    pickUpItem(obj){
+      console.log("obj", obj);
+      this.hoeArray = this.hoeArray.filter(hoe => hoe.id == obj.id);
+      this.inventoryArray.push(obj);
+      console.log("Invetory:", this.inventoryArray);
+      console.log("Hoe Array:", this.hoeArray);
     },
 
     // Initiated when player emits harvestHere
@@ -306,12 +461,22 @@ for (i = 6; i > 0; i--) {
       if (this.food == 6) {
         alert("You have gathered enough for the winter.");
       }
-      this.$forceUpdate();
+    },
+
+    outsideNow(){
+      this.outside = false;
     },
 
     log() {
       console.log("Keys are working in App.vue");
     }
   }
+// *******************************************************************************************************************************
+//                                                BOTTOM OF METHODS
+// *******************************************************************************************************************************
 };
+
+// *******************************************************************************************************************************
+//                                                  END OF SCRIPT
+// *******************************************************************************************************************************
 </script>
