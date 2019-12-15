@@ -2,6 +2,7 @@
  ---------------------------------------TEMPLATE ---------------------------------------------
 --------------------------------------------------------------------------------------------->
 <template>
+
  <div id="container" tabindex="0" 
       @keydown.87.exact="moveUp()" 
       @keydown.83.exact="moveDown()" 
@@ -33,9 +34,9 @@
 
       <v-rect
         :config="{
-            width: 2000,
+            width: 2200,
             height: 2000,
-            fill: '#8EA8C3',
+            fill: 'black',
             stroke: '#8EA8C3'
           }"
       ></v-rect>
@@ -283,17 +284,16 @@ export default {
 
     generateGrid() { // -- Generates the basic perimeter and
       var id = 0;    //    basic colored ground tiles
-      var i = 20;
-      var j = 20;
-      var ySpace = 100;
-      var xSpace = 100;
+  
+      var ySpace = 120;
+      var xSpace = 0;
 
       this.Perimeter.yUp = ySpace;
       this.Perimeter.xLeft = xSpace;
-      for (j = 40; j > 0; j--) {
-        xSpace = 100;
+      for (var j = 28; j > 0; j--) {
+        xSpace = 0;
 
-        for (i = 40; i > 0; i--) {
+        for (var i = 50; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: "grid#" + id, show: "O" });
           xSpace += 20;
           id++;
@@ -301,7 +301,7 @@ export default {
         ySpace += 20;
       }
       this.Perimeter.xRight = xSpace - 20;
-      this.Perimeter.yDown = ySpace;
+      this.Perimeter.yDown = ySpace - 20;
     },
 
     generateBoundaries() { // -- Generated wall tiles and
@@ -386,7 +386,7 @@ export default {
       var id = 0;
       var i = 20;
       var j = 20;
-      var ySpace = 100;
+      var ySpace = 160;
 
       for (j = 20; j > 0; j--) {
         var xSpace = 260;
