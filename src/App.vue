@@ -4,10 +4,14 @@
 <template>
 
  <div id="container" tabindex="0" 
-      @keydown.87.exact="moveUp()" 
+      @keydown.87.exact="moveUp()"
+      @keyup.87.exact="stopMoving()"
       @keydown.83.exact="moveDown()" 
+      @keyup.83.exact="stopMoving()" 
       @keydown.65.exact="moveLeft()"
+      @keyup.65.exact="stopMoving()"
       @keydown.68.exact="moveRight()" 
+      @keyup.68.exact="stopMoving()" 
 
 
       @keydown.shift.87.exact="buildT()"
@@ -27,8 +31,8 @@
         container: 'container',
         x: 10,
         y: 10,
-        width: 1200,
-        height: 700
+        width: 1110,
+        height: 760
         }">
     <v-fastLayer>
 
@@ -75,6 +79,8 @@
       <!-- <BoundaryTile></BoundaryTile> -->
       <v-layer>
 
+       <EnvironmentBanner></EnvironmentBanner> 
+
 
 <!--                                  PLAYER COMPONENT                                    -->
       <Player
@@ -114,6 +120,7 @@
 
     </v-layer>
   </v-stage>
+
   </div>
 </template>
 
@@ -137,13 +144,14 @@ import HomeTile from "./HomeTile.vue";
 import step1 from "./step1.vue";
 import Character from "./Character.vue";
 import Hoe from "./Hoe.vue";
+import EnvironmentBanner from "./EnvironmentBanner.vue";
 
 
 
 // *******************************************************************************************************************************
 //                                                     DATA
 // *******************************************************************************************************************************
-export default {
+export default {  
   components: {
     Tile: Tile,
     Player: Player,
@@ -155,6 +163,7 @@ export default {
     step1: step1,
     Character: Character,
     Hoe: Hoe,
+    EnvironmentBanner: EnvironmentBanner
   },
   data() {
     return {
@@ -169,6 +178,9 @@ export default {
       irrigationArray: [],
       stepArray: [],
       hoeArray: [],
+
+      moving: true,
+      speed: 100,
 
         // ****************************                 dCHARACTER DATA
       CharacterInfo: {
@@ -197,6 +209,7 @@ export default {
         text: "/6"
       },
 
+      interval: null,
       outside: true,
 
 
@@ -231,18 +244,50 @@ export default {
 // *******************************************************************************************************************************
   methods: { 
     moveUp(){
-      this.$refs.player.moveUp();
+      if(this.moving){
+        this.moving = false;                
+        this.$refs.player.moveUp();
+        this.interval = setInterval(() => {
+          this.$refs.player.moveUp();
+    }, this.speed);
       console.log("player!!!!:", this.$refs.player)
+      }
     },
+      stopMoving(){
+        this.moving = true;
+        clearInterval(this.interval)
+      },
     moveDown(){
-      this.$refs.player.moveDown();
+      if(this.moving){
+        this.moving = false;
+          this.$refs.player.moveDown();
+        this.interval = setInterval(() => {
+          this.$refs.player.moveDown();
+    }, this.speed);
+      console.log("player!!!!:", this.$refs.player)
+      }
     },
     moveLeft(){
-      this.$refs.player.moveLeft();
+       if(this.moving){
+        this.moving = false;
+        this.$refs.player.moveLeft();
+        this.interval = setInterval(() => {
+          this.$refs.player.moveLeft();
+    }, this.speed);
+      console.log("player!!!!:", this.$refs.player)
+      }
     },
     moveRight(){
-      this.$refs.player.moveRight();
+       if(this.moving){
+        this.moving = false;
+        this.$refs.player.moveRight();
+        this.interval = setInterval(() => {
+          this.$refs.player.moveRight();
+    }, this.speed);
+      console.log("player!!!!:", this.$refs.player)
+      }
     },
+
 
     buildT(){
       this.$refs.player.buildT();
@@ -285,15 +330,15 @@ export default {
     generateGrid() { // -- Generates the basic perimeter and
       var id = 0;    //    basic colored ground tiles
   
-      var ySpace = 120;
+      var ySpace = 160;
       var xSpace = 0;
 
       this.Perimeter.yUp = ySpace;
       this.Perimeter.xLeft = xSpace;
-      for (var j = 28; j > 0; j--) {
+      for (var j = 29; j > 0; j--) {
         xSpace = 0;
 
-        for (var i = 50; i > 0; i--) {
+        for (var i = 55; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: "grid#" + id, show: "O" });
           xSpace += 20;
           id++;
@@ -480,3 +525,4 @@ d
 //                                                  END OF SCRIPT
 // *******************************************************************************************************************************
 </script>
+

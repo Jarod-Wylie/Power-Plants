@@ -2,7 +2,7 @@
  ---------------------------------------TEMPLATE ---------------------------------------------
 --------------------------------------------------------------------------------------------->
 <template>
-  <div id="container" tabindex="0" @keyup.right="moveUp()">
+  <div >
     <!-- Player Location -->
     <!-- <v-text :config="PlayerLog" /> -->
 
@@ -111,13 +111,6 @@ export default {
       playerLevel: false,
       onPlatform: false,
       
-      // playerShadow: { 
-      //   x: this.HomeInfo.x,
-      //   y: this.HomeInfo.y,
-      //   height: 20,
-      //   width: 20,
-      //   fill: "#7C736D"
-      // },
 
       energy: {
         x: 200,
@@ -239,18 +232,19 @@ export default {
 
     // ****************************              PLAYER MOVEMENT
     moveUp() {
-      if (this.player.y != this.Perimeter.yUp) {
-        var boundaryFound = this.playerBoundaries.find(
-          playerBoundaries =>
+
+        if (this.player.y != this.Perimeter.yUp) {
+          var boundaryFound = this.playerBoundaries.find(
+            playerBoundaries =>
             playerBoundaries.x == this.player.x &&
             playerBoundaries.y + this.offSet == this.player.y
         );
           // Checks to see if water is the boundary. Allows walls and platforms to be generated next to water
           if(boundaryFound){
             if (boundaryFound.type == "water" ) {
-
+              
               var wallFound = this.playerBoundaries.find(
-              playerBoundaries =>
+                playerBoundaries =>
               playerBoundaries.x == this.player.x &&
               playerBoundaries.y + this.offSet == this.player.y &&
               playerBoundaries.type == 'wall');
@@ -291,7 +285,7 @@ export default {
         }
 
           if (!boundaryFound && this.playerLevel == true) {
-          // this.playerLevel = false
+            // this.playerLevel = false
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
           this.subtractEnergy();

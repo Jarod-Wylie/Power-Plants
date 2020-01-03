@@ -2,8 +2,20 @@
 
 <template>
   <div>
-    <v-rect :config="square"></v-rect>
-    <!-- <v-text :config="symbol"/> -->
+     <v-sprite ref="sprite" :config="{
+ 
+        image: imageObj,
+        x: this.HomeInfo.x,
+        y: this.HomeInfo.y - 5,
+        animation:'burning',
+        animations: animations,
+        frameRate: 3,
+        frameIndex: 0,
+        
+
+        width: 50,
+        height: 50
+      }"/>
   </div>
 </template>
 
@@ -15,27 +27,53 @@ export default {
   },
   data() {
     return {
-      square: {
-        x: this.HomeInfo.x,
-        y: this.HomeInfo.y,
-        height: 20,
-        width: 20,
-        fill: "yellow",
-        stroke: "black",
-        strokeWidth: 1,
-      },
-      // symbol: {
-      //   x: this.HomeInfo.x,
-      //   y: this.HomeInfo.y,
-      //   fontSize: 15,
-      //   text: "H",
-      //   fill: "red"
-      // },
+      interval: null,
+      imageObj: null,
+      animations: {
+        burning: [
+              0,
+              -5,
+              17,
+              40,
+
+              16,
+              -5,
+              17,
+              40,
+              
+              32,
+              -5,
+              17,
+              40,
+
+              48,
+              -5,
+              17,
+              40
+            ]},
+      
       }
   },
 
+  created(){
+      var imageObj = new window.Image();
+     imageObj.src = require("./assets/fire.png");
+    //  imageObj.src = require(this.animations[0]);
+    // image.src = "https://konvajs.org/assets/yoda.jpg";
+    console.log(imageObj) 
+    imageObj.onload = () => {
+
+      // set image only when it is loaded
+      this.imageObj = imageObj;
+    }
+},
+
   mounted() {
-    console.log("HomeTile Mounted");
-  }
+    console.log("HomeTile Mounted:", this.imageObj);
+
+     const node = this.$refs.sprite.getNode();
+
+        node.start();   
+  },
 };
 </script>

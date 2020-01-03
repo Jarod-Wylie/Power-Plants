@@ -6,6 +6,7 @@ import App from './App.vue'
 
 Vue.use(VueKonva)
 
+
 Vue.config.productionTip = false
 
 new Vue({
