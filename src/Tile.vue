@@ -2,6 +2,7 @@
 
 <template>
   <div>
+
     <!-- <v-rect :config="square"></v-rect> -->
     <!-- <v-text :config="symbol"/> -->
   </div>
@@ -11,7 +12,7 @@
 export default {
   name: "Tile",
   props: {
-    Coordinates: Object
+    Coordinates: Objects
   },
   data() {
     return {

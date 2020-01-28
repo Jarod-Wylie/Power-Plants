@@ -3,50 +3,17 @@
 --------------------------------------------------------------------------------------------->
 <template>
   <div >
-    <!-- Player Location -->
-    <!-- <v-text :config="PlayerLog" /> -->
-
-    <!-- Player Energy bar -->
-    <v-text :config="energy" />
-
-    <!-- Actions players can take -->
-
-    <!-- Directions -->
-    <!-- <v-rect @click="moveUp()"  :config="upButton" />
-    <v-text @click="moveUp()" :config="Up" />
-
-    <v-rect @click="moveDown()" :config="downButton" />
-    <v-text @click="moveDown()" :config="Down" />
-
-    <v-rect @click="moveRight()" :config="rightButton" />
-    <v-text @click="moveRight()" :config="Right" />
-
-    <v-rect @click="moveLeft()" :config="leftButton" />
-    <v-text @keyup.left="moveLeft()" @click="moveLeft()" :config="Left" /> -->
-
-    <!-- Farming Actions -->
-    <!-- <v-circle @click="plant()" :config="Plant" /> -->
-    <!-- <v-circle @click="irrigate()" :config="Irrigate" />
-    <v-rect @click="harvest()" :config="Harvest" /> -->
-
-    <!-- Build Actions -->
-    <!-- <v-rect @click="buildT()" :config="BuildButtonTop" />
-    <v-rect @click="buildB()" :config="BuildButtonBottom" />
-    <v-rect @click="buildL()" :config="BuildButtonLeft" />
-    <v-rect @click="buildR()" :config="BuildButtonRight" />
-    <v-circle :config="loading"/> -->
 
     <!-- Social Actions -->
     <!-- <v-circle @click="talk()" :config="talkButton" /> -->
 
-    <!-- <v-rect :config="playerShadow"/> -->
     <v-text :config="player" ref="player"/>
 
     <!-- Characters and Enemies -->
     <enemy></enemy>
 
-    <Character :CharacterInfo="CharacterInfo"></Character>
-    <v-text :config="characterSpeech" />
+    <!-- <Character :CharacterInfo="CharacterInfo"></Character> -->
+    <!-- <v-text :config="characterSpeech" /> -->
   </div>
 </template>
 
@@ -60,7 +27,7 @@
 //  ******************************************************************************************************************************
 //                                                 DEPENDENCIES
 // *******************************************************************************************************************************
-import Character from "./Character.vue";
+// import Character from "./Character.vue";
 import Enemy from "./Enemy.vue";
 
 export default {
@@ -110,76 +77,6 @@ export default {
 
       playerLevel: false,
       onPlatform: false,
-      
-
-      energy: {
-        x: 200,
-        y: 550,
-        fontSize: 30,
-        text: "/////////////////",
-        stroke: "green"
-      },
-
-// ****************************              CONTROLL BUTTONS
-      upButton: {
-        x: 780,
-        y: 390,
-        width: 60,
-        height: 40,
-        fill: "#CCDDE2",
-        stroke: "black"
-      },
-      Up: {
-        x: 800,
-        y: 400,
-        fontSize: 15,
-        text: ""
-      },
-
-      downButton: {
-        x: 780,
-        y: 500,
-        width: 60,
-        height: 40,
-        fill: "#CCDDE2",
-        stroke: "black"
-      },
-      Down: {
-        x: 800,
-        y: 500,
-        fontSize: 15,
-        text: ""
-      },
-
-      rightButton: {
-        x: 865,
-        y: 450,
-        width: 60,
-        height: 40,
-        fill: "#CCDDE2",
-        stroke: "black"
-      },
-      Right: {
-        x: 900,
-        y: 450,
-        text: ""
-      },
-
-      leftButton: {
-        x: 700,
-        y: 450,
-        width: 60,
-        height: 40,
-        fill: "#CCDDE2",
-        stroke: "black"
-      },
-      Left: {
-        x: 700,
-        y: 450,
-        fontSize: 15,
-        text: ""
-      },
-
       
 
       // ****************************                 dCHARACTER DATA
@@ -267,7 +164,7 @@ export default {
         if (stepFound) {
           this.player.y -= this.offSet
           this.playerLevel = null
-          console.log("stepFound:", this.playerLevel);
+          console.log("stepFound: ", this.playerLevel);
           return null
         }
 
@@ -275,7 +172,7 @@ export default {
           this.playerLevel = true;
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.y -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
@@ -288,7 +185,7 @@ export default {
             // this.playerLevel = false
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
-          this.subtractEnergy();
+
           // this.player.y -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
@@ -299,7 +196,7 @@ export default {
           this.playerLevel = false
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.y -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
@@ -349,7 +246,7 @@ export default {
           this.playerLevel = true
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.y += this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
@@ -362,7 +259,7 @@ export default {
           // this.playerLevel = false
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
-          this.subtractEnergy();
+
           // this.player.y -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
@@ -373,7 +270,7 @@ export default {
           this.playerLevel = false
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.y += this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
@@ -422,7 +319,7 @@ export default {
           this.playerLevel = true
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.x += this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
@@ -435,7 +332,7 @@ export default {
           // this.playerLevel = false
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
-          this.subtractEnergy();
+
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
         }
@@ -445,7 +342,7 @@ export default {
           this.playerLevel = false
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.x += this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
@@ -495,7 +392,7 @@ export default {
           this.playerLevel = true
           console.log("Player moved North");
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.x -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
 
@@ -508,7 +405,7 @@ export default {
           // this.playerLevel = false
           console.log("is the playe on a platform?", this.onPlatform)
           console.log("Player Level Platform block:", this.playerLevel);
-          this.subtractEnergy();
+
           // this.player.y -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
           return null
@@ -519,7 +416,7 @@ export default {
           this.playerLevel = false
           console.log("Player Level ground main:", this.playerLevel);
           // console.log("playerBoundaries Array", this.playerBoundaries);
-          this.subtractEnergy();
+
           this.player.x -= this.offSet;
           // this.PlayerLog.text = "x:" + this.player.x + " y:" + this.player.y;
         }
@@ -527,26 +424,6 @@ export default {
     },
     // ****************************              BOTTOM OF PLAYER MOVEMENT METHODS
 
-
-    // ****************************                  PLAYER STATUS FUNCTIONS
-
-    subtractEnergy() {
-      var str = this.energy.text;
-        if (
-          this.player.x == this.HomeInfo.x &&
-          this.player.y == this.HomeInfo.y 
-        ) {
-          this.$emit("inside")
-          this.energy.text = "///////////////////////////////////////////////";
-        }
-      this.energy.text = str.substring(0, str.length - 1);
-      if (str.length < str.length / 2) {
-        this.energy.stroke = "yellow";
-      }
-      // if(str.length == 0){
-      //   alert("Players has died of fatigue")
-      // }
-    },
 
     // ****************************              CONSTRUCTION METHODS
     buildT(){
@@ -585,6 +462,12 @@ export default {
     },
 // ****************************              BOTTOM OF CONSTRUCTION METHODS
 
+feedFire(){
+  if (this.player.x == this.HomeInfo.x && this.player.y == this.HomeInfo.y){
+    this.$emit("feedFire");
+  }
+
+},
 
 // ****************************                      GRAB METHODS
 
@@ -662,7 +545,8 @@ grab(){
           id: this.plantID,
           x: this.player.x,
           y: this.player.y,
-          maturity: 'seed'
+          seedChance: Math.random() * 100,
+          maturity: 'seed',
         });
         this.plantID++;
       } else if (plantFound || irrigatationFoundHere) {

@@ -2,6 +2,30 @@
 
 <template>
   <div>
+
+<v-group>
+      <v-rect rect='across' :config="{
+        x: this.HomeInfo.x -20,
+        y: this.HomeInfo.y,
+        height: 20,
+        width: 60,
+        fill: '#9BA59F',
+        stroke: 'black'
+
+        }"></v-rect>
+
+      <v-rect rect='up_down' :config="{
+        x: this.HomeInfo.x ,
+        y: this.HomeInfo.y - 20,
+        height: 60,
+        width: 20,
+        fill: '#9BA59F',
+        stroke: 'black'
+
+        }"></v-rect>
+</v-group>
+
+
      <v-sprite ref="sprite" :config="{
  
         image: imageObj,
@@ -16,6 +40,7 @@
         width: 50,
         height: 50
       }"/>
+      
   </div>
 </template>
 

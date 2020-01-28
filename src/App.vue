@@ -11,7 +11,8 @@
       @keydown.65.exact="moveLeft()"
       @keyup.65.exact="stopMoving()"
       @keydown.68.exact="moveRight()" 
-      @keyup.68.exact="stopMoving()" 
+      @keyup.68.exact="stopMoving()"
+      @keydown.74.exact="playerFeedFire()" 
 
 
       @keydown.shift.87.exact="buildT()"
@@ -20,11 +21,10 @@
       @keydown.shift.68.exact="buildR()"
 
       @keyup.80="plantHere()"
-      @keyup.72="harvestHere()"
+      @keydown.72="harvestHere()"
       @keyup.71.exact="grab()"
       @keyup.73="irrigateHere()"
       @keyup.84="talkHere()"
-
      
       >
   <v-stage ref="stage" :config="{
@@ -53,14 +53,6 @@
             text:'Harvest 6 ideal plants(yellow) to survive the winter.',
             }"
       />
-      <v-text
-        :config="{
-            x: 1000,
-            y: 100,
-            fontSize:25,
-            text: food + '/6',
-            }"
-      />
       <v-rect
         :config="{
             x: i.x,
@@ -82,7 +74,53 @@
        <EnvironmentBanner></EnvironmentBanner> 
 
 
-<!--                                  PLAYER COMPONENT                                    -->
+
+
+        <!-- <Character :CharacterInfo="CharacterInfo"></Character> -->
+        <!-- <v-text :config="characterSpeech" /> -->
+
+      <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
+      <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
+      <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
+      <PlantTile ref="plant" v-for="i in plantArray" :key="i.id" :plantInfo="i" :plantArray="plantArray"
+                 @growing="growing"></PlantTile>
+      <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
+      <step1  v-for="i in stepArray" :key="i.id" :stepInfo="i"></step1>
+      <Hoe  v-for="i in hoeArray" :key="i.id" :hoeInfo="i"></Hoe>
+
+      <!-- <Enemy></Enemy> -->
+
+ <v-text
+        :config="{
+            x: 25,
+            y: 25,
+            fontSize:25,
+            stroke: this.fireColor,
+            text: this.fireLife,
+            }"
+      />
+
+       <v-text
+        :config="{
+            x: 25,
+            y: 50,
+            fontSize:25,
+            stroke: 'brown',
+            text: this.crops,
+            }"
+      />
+
+       <v-text
+        :config="{
+            x: 25,
+            y: 75,
+            fontSize:25,
+            stroke: 'green',
+            text: this.seeds,
+            }"
+      />
+
+      <!--                                  PLAYER COMPONENT                                    -->
       <Player
         ref="player" 
         :HomeInfo="HomeArray[0]"
@@ -101,22 +139,9 @@
         @harvestHere="harvest"
         @pickUpItem="pickUpItem"
         @playerLocation="set"
+        @feedFire="feedFire"
       ></Player>
                           <!-- BOTTOM OF PLAYER COMPONENT -->
-
-        <Character :CharacterInfo="CharacterInfo"></Character>
-        <v-text :config="characterSpeech" />
-
-      <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
-      <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
-      <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
-      <PlantTile v-for="i in plantArray" :key="i" :plantInfo="i" :plantArray="plantArray"></PlantTile>
-      <BoundaryTile v-for="i in wallArray" :key="i.wallID" :wallInfo="i"></BoundaryTile>
-      <step1  v-for="i in stepArray" :key="i.id" :stepInfo="i"></step1>
-      <Hoe  v-for="i in hoeArray" :key="i.id" :hoeInfo="i"></Hoe>
-
-      <!-- <Enemy></Enemy> -->
-
 
     </v-layer>
   </v-stage>
@@ -134,7 +159,9 @@
 //  ******************************************************************************************************************************
 //                                                 DEPENDENCIES
 // *******************************************************************************************************************************
-import Tile from "./Tile.vue";
+// import store from './store'
+
+// import Tile from "./Tile.vue";
 import Player from "./Player.vue";
 import BoundaryTile from "./BoundaryTile.vue";
 import irrigationTile from "./irrigationTile.vue";
@@ -142,7 +169,7 @@ import PlantTile from "./PlantTile.vue";
 import waterTile from "./waterTile.vue";
 import HomeTile from "./HomeTile.vue";
 import step1 from "./step1.vue";
-import Character from "./Character.vue";
+// import Character from "./Character.vue";
 import Hoe from "./Hoe.vue";
 import EnvironmentBanner from "./EnvironmentBanner.vue";
 
@@ -151,9 +178,10 @@ import EnvironmentBanner from "./EnvironmentBanner.vue";
 // *******************************************************************************************************************************
 //                                                     DATA
 // *******************************************************************************************************************************
-export default {  
+export default {
+
   components: {
-    Tile: Tile,
+    // Tile: Tile,
     Player: Player,
     HomeTile: HomeTile,
     BoundaryTile: BoundaryTile,
@@ -161,7 +189,7 @@ export default {
     waterTile: waterTile,
     irrigationTile: irrigationTile,
     step1: step1,
-    Character: Character,
+    // Character: Character,
     Hoe: Hoe,
     EnvironmentBanner: EnvironmentBanner
   },
@@ -179,8 +207,15 @@ export default {
       stepArray: [],
       hoeArray: [],
 
+      fireLife: '////////////////////',
+      fireColor: 'orange',
+      crops:'////////////////////',
+      burnRate: 2500,
+
+      seeds:'//',
+
       moving: true,
-      speed: 100,
+      speed: 10,
 
         // ****************************                 dCHARACTER DATA
       CharacterInfo: {
@@ -201,15 +236,9 @@ export default {
         text: ""
       },
 
-      food: 0,
-      goal: {
-        x: 800,
-        y: 100,
-        fontSize: 25,
-        text: "/6"
-      },
 
       interval: null,
+      dayInterval: null,
       outside: true,
 
 
@@ -220,23 +249,25 @@ export default {
 // *******************************************************************************************************************************
 //                                                BOTTOM OF DATA
 // *******************************************************************************************************************************
-  created(){
-    ;
 
-  },
   mounted() {  // -----------------                   MOUNTED 
-//     var vm = this
-//     var container = vm.$refs.stage.$el
-//     container.focus();
+    this.dayInterval = setInterval(() => {
+      console.log("hoieoheo")
+      this.$refs.plant.forEach(element => {
+        element.growPlant();
+      });
+    }, 10000);
+    this.startFire();
 
-// console.log("stage:",vm.$refs.stage.$el)
-
-// console.log("stage2:", this.stage.container())
     this.generateGrid();
     this.generateBoundaries();
     this.generateSteps();
     this.generateWater();
+    this.plantGenerator();
     this.itemsGenerator();
+
+
+    
   },
 
 // *******************************************************************************************************************************
@@ -244,36 +275,48 @@ export default {
 // *******************************************************************************************************************************
   methods: { 
     moveUp(){
+
       if(this.moving){
         this.moving = false;                
         this.$refs.player.moveUp();
-        this.interval = setInterval(() => {
-          this.$refs.player.moveUp();
-    }, this.speed);
-      console.log("player!!!!:", this.$refs.player)
+        // this.interval = setInterval(() => {
+        //   this.$refs.player.moveUp();
+        // }, this.speed);
+          // this.$refs.player.moveUp();
+        setTimeout(() => {
+          this.moving = true;
+        }, this.speed);
+        console.log("player!!!!:", this.$refs.player)
       }
     },
-      stopMoving(){
-        this.moving = true;
-        clearInterval(this.interval)
-      },
+    stopMoving(){
+      // this.moving = true;
+      // clearInterval(this.interval)
+    },
     moveDown(){
       if(this.moving){
         this.moving = false;
           this.$refs.player.moveDown();
-        this.interval = setInterval(() => {
-          this.$refs.player.moveDown();
-    }, this.speed);
-      console.log("player!!!!:", this.$refs.player)
+    //     this.interval = setInterval(() => {
+    //       this.$refs.player.moveDown();
+    // }, this.speed);
+         setTimeout(() => {
+          this.moving = true;
+        }, this.speed);
+        console.log("player!!!!:", this.$refs.player)
+
       }
     },
     moveLeft(){
        if(this.moving){
         this.moving = false;
         this.$refs.player.moveLeft();
-        this.interval = setInterval(() => {
-          this.$refs.player.moveLeft();
-    }, this.speed);
+    //     this.interval = setInterval(() => {
+    //       this.$refs.player.moveLeft();
+    // }, this.speed);
+    setTimeout(() => {
+          this.moving = true;
+        }, this.speed);
       console.log("player!!!!:", this.$refs.player)
       }
     },
@@ -281,9 +324,12 @@ export default {
        if(this.moving){
         this.moving = false;
         this.$refs.player.moveRight();
-        this.interval = setInterval(() => {
-          this.$refs.player.moveRight();
-    }, this.speed);
+    //     this.interval = setInterval(() => {
+    //       this.$refs.player.moveRight();
+    // }, this.speed);
+    setTimeout(() => {
+          this.moving = true;
+        }, this.speed);
       console.log("player!!!!:", this.$refs.player)
       }
     },
@@ -305,7 +351,14 @@ export default {
       this.$refs.player.grab();
     },
     plantHere(){
-      this.$refs.player.plant();
+      if(this.seeds.length <= 0){
+        return null;
+      }
+      else{
+        this.$refs.player.plant();
+        console.log("plant REF:", this.$refs);
+        // this.seeds = this.seeds.substring(0, this.seeds.length - 1);
+      }
     },
 
     irrigateHere(){
@@ -318,6 +371,9 @@ export default {
       this.$refs.player.harvest();
     },
 
+    playerFeedFire(){
+      this.$refs.player.feedFire();
+    },
 
 
     test(){
@@ -455,6 +511,31 @@ export default {
       }
     },
 
+    plantGenerator(){
+
+      var id = 0;
+      var i = 20;
+      var j = 20;
+      var ySpace = 160;
+
+      for (j = 5; j > 0; j--) {
+        var xSpace = Math.floor((Math.random() * 100)) * 20;
+        console.log('Xxxxx', xSpace)
+
+        for (i = 15; i > 0; i--) {
+          this.plantArray.push({
+            x: xSpace,
+            y: ySpace,
+            seedChance: Math.random() * 100,
+            id: "genPlant#:" + id
+          });
+               xSpace = Math.floor((Math.random() * 100)) * 20;;
+              id++;
+      }
+           ySpace = Math.floor((Math.random() * 100)) * 20;;
+      }
+    },
+
     itemsGenerator(){
       this.hoeArray.push({x:200, y:200, id:'hoe' + 1, type:'hoe'});
     },
@@ -469,11 +550,15 @@ export default {
 
     // Initiated when player emits plantHere
     plant(obj) {
+              this.seeds = this.seeds.substring(0, this.seeds.length - 1);
       console.log("Planted", obj);
 
       this.plantArray.push(obj);
 d
       console.log("plant Array:", this.plantArray);
+      
+      
+
     },
 
     build(obj){
@@ -486,26 +571,80 @@ d
       console.log("obj", obj);
       this.hoeArray = this.hoeArray.filter(hoe => hoe.id == obj.id);
       this.inventoryArray.push(obj);
-      console.log("Invetory:", this.inventoryArray);
+      console.log("Invetor1y:", this.inventoryArray);
       console.log("Hoe Array:", this.hoeArray);
     },
 
+    growing(obj){
+      
+      // console.log('plantArray:', obj)
+      // console.log('plantArray:', obj)
+      var plantGrowing = this.plantArray.findIndex( plant => obj.id == plant.id)
+      console.log('Growing:', obj.maturity)
+
+      this.plantArray[plantGrowing].maturity = obj.maturity
+      this.plantArray[plantGrowing].seedChance = this.plantArray[plantGrowing].seedChance + 15
+
+    },
+
+   
+
     // Initiated when player emits harvestHere
     harvest(obj) {
-      console.log("obj", obj);
       var newItem = this.plantArray.find(plant => plant.id == obj.id);
-      console.log("newitem:", newItem);
       this.plantArray = this.plantArray.filter(plant => plant.id != obj.id);
-      this.inventoryArray.push(newItem);
-      console.log("Invetory:", this.inventoryArray);
-      console.log("PlantArray:", this.plantArray);
 
-      if(obj.maturity == 'ideal'){
-        this.food++;
+
+
+       if (newItem.seedChance >= 102){
+        this.seeds = this.seeds + '///';
       }
-      if (this.food == 6) {
-        alert("You have gathered enough for the winter.");
+      else if (newItem.seedChance >= 75){
+        this.seeds = this.seeds + '/';
       }
+
+
+      if (newItem.maturity == 'seedling'){
+        this.crops = this.crops + '/';
+      }
+      if (newItem.maturity == 'mature'){
+        this.crops = this.crops + '////';
+      }
+       if (newItem.maturity == 'ideal'){
+        this.crops = this.crops + '///////////////';
+      }
+      
+    },
+
+    startFire(){
+
+          this.interval = setInterval(() => {
+    
+          if (this.fireLife.length == 4){
+            this.$refs.player.player.fill = 'blue'
+            this.fireColor = 'blue';
+            this.speed = 200
+            this.burnRate = 3000;
+            clearInterval(this.interval);
+            this.startFire();
+          }
+        this.fireLife = this.fireLife.substring(0, this.fireLife.length - 1);
+        }, this.burnRate);
+    },
+
+    feedFire(){
+      this.fireLife = this.fireLife + this.crops
+      this.crops = '';
+
+      if(this.fireLife.length >= 5){
+        this.$refs.player.player.fill = '#EF4700'
+        this.fireColor = 'orange';
+        this.burnRate = 2500;
+        this.speed = 5;
+        clearInterval(this.interval);
+        this.startFire();
+      }
+
     },
 
     outsideNow(){

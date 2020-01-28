@@ -27,7 +27,8 @@ export default {
         width: 20,
         fill: "#8C775C",
         stroke: "green",
-        strokeWidth: 0.5
+        strokeWidth: 0.5,
+        listening: false
       },
 
       plant: {
@@ -35,17 +36,8 @@ export default {
         y: this.plantInfo.y,
         fontSize: 15,
         text: ' p',
-        stroke: "black"
-      },
-       harvestButton: {
-        x: 780,
-        y: 550,
-        height: 30,
-        width: 90,
         stroke: "black",
-        // fontSize: 15,
-        // text: "Harvest",
-        fill: "orange"
+        listening:false,
       },
     };
   },
@@ -54,9 +46,9 @@ export default {
     console.log("PlantTile Mounted");
     console.log("maturity:", this.maturity);
 
-    this.interval = setInterval(() => {
-      this.growPlant();
-    }, 10000);
+    // this.interval = setInterval(() => {
+    //   this.growPlant();
+    // }, 10000);
 
   },
 
@@ -70,34 +62,43 @@ export default {
       this.count += 1;
 
       switch(this.count){
-        case 10:
-          this.plant.maturity = "seedling";
+        case 3:
           this.plant.stroke = "green";
 
-          // console.log("seedling count:", this.count);
+          this.$emit("growing", {
+          id: this.plantInfo.id,
+          maturity: 'seedling'
+        });
           break;
           
-        case 20:
-          this.plant.maturity = "mature";
+        case 10:
           this.plant.fontSize = 30;
+
+           this.$emit("growing", {
+          id: this.plantInfo.id,
+          maturity: 'mature'
+        });
           break;
         case 25:
-          this.plant.maturity = "ideal";
           this.plant.stroke = "yellow"
+
+          this.$emit("growing", {
+          id: this.plantInfo.id,
+          maturity: 'ideal'
+        });
           break;
         case 29:
-          this.plant.maturity = "dead";
+
           this.plant.stroke = "black";
           this.plant.fontSize = 10;
           this.plant.text = "X";
+          this.$emit("growing", {
+          id: this.plantInfo.id,
+          maturity: 'dead'
+        });
           clearInterval(this.interval);
           break;
       }
-      // console.log("my coords", this.plant.x, "__", this.plant.y)
-
-      // console.log("maturity:", this.maturity);
-      // console.log("interval:", this.count);
-      
     }
 
   }
