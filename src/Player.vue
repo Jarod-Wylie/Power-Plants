@@ -10,7 +10,7 @@
     <v-text :config="player" ref="player"/>
 
     <!-- Characters and Enemies -->
-    <enemy></enemy>
+    <!-- <enemy></enemy> -->
 
     <!-- <Character :CharacterInfo="CharacterInfo"></Character> -->
     <!-- <v-text :config="characterSpeech" /> -->
@@ -67,10 +67,9 @@ export default {
         y: this.HomeInfo.y,
         fontSize: 25,
         text: "\u0FC7",
-        fill: "#EF4700",
-        // shadowBlur: 10,
-        filters: this.filters,
-        blur:200
+        fill: "#FF5A1E",
+        listening: false,
+        perfectDrawEnabled: false
       },
 
       offSet: 20, // --- off sets player image to look more center to tile
@@ -463,7 +462,13 @@ export default {
 // ****************************              BOTTOM OF CONSTRUCTION METHODS
 
 feedFire(){
-  if (this.player.x == this.HomeInfo.x && this.player.y == this.HomeInfo.y){
+  if (
+    this.player.x == this.HomeInfo.x + 20  && this.player.y == this.HomeInfo.y ||
+    this.player.x == this.HomeInfo.x - 20 && this.player.y == this.HomeInfo.y ||
+    this.player.x == this.HomeInfo.x && this.player.y == this.HomeInfo.y + 20 ||
+    this.player.x == this.HomeInfo.x && this.player.y == this.HomeInfo.y - 20 
+    )
+   {
     this.$emit("feedFire");
   }
 
@@ -496,12 +501,15 @@ grab(){
           (plant.x == this.player.x - this.offSet && plant.y == this.player.y - this.offSet)
       ));
 
+    
+
       var waterFoundLeft = this.waterArray.find(
         water => water.x + this.offSet == this.player.x && water.y == this.player.y
       );
       var waterFoundRight = this.waterArray.find(
         water => water.x - this.offSet == this.player.x && water.y == this.player.y
       );
+
       var waterFoundUp = this.waterArray.find(
         water => water.x == this.player.x && water.y + this.offSet == this.player.y
       );
@@ -530,37 +538,57 @@ grab(){
         (waterFoundLeft ||
           waterFoundRight ||
           waterFoundUp ||
-          waterFoundDown ||
-          irrigatationFoundLeft ||
-          irrigatationFoundRight ||
-          irrigatationFoundUp ||
-          irrigatationFoundDown) &&
-        !irrigatationFoundHere
+          waterFoundDown ) && (!irrigatationFoundHere)
       ) {
         // console.log("irrgationFounHere:", irrigatationFoundHere)
 
         console.log("Player is planting.....");
 
         this.$emit("plantHere", {
-          id: this.plantID,
+          id: "player Planted" + this.plantID,
           x: this.player.x,
           y: this.player.y,
           seedChance: Math.random() * 100,
           maturity: 'seed',
         });
         this.plantID++;
-      } else if (plantFound || irrigatationFoundHere) {
+        return 'Planted in not ideal soil.'
+      } 
+
+     
+      if((irrigatationFoundLeft ||
+          irrigatationFoundRight ||
+          irrigatationFoundUp ||
+          irrigatationFoundDown ) && (!irrigatationFoundHere)){
+          
+          this.$emit("plantHere", {
+            id: "player Planted" + this.plantID,
+            x: this.player.x,
+            y: this.player.y,
+            seedChance: Math.random() * 100,
+            maturity: 'seed',
+            soil: 'ideal'
+        });
+        this.plantID++;
+        return 'Planted ideal soil.'
+          }
+           if (plantFound || irrigatationFoundHere) {
         console.log(
           "There is not enough water in the soil to plant another plant here."
         );
-      } else {
+        return "Can not plant here!"
+        }
+          else {
+            
         console.log("Player is planting.....");
 
         this.$emit("plantHere", {
-          id: this.plantID,
+          id: "player Planted" + this.plantID,
           x: this.player.x,
           y: this.player.y,
-          maturity: 'seed'
+          maturity: 'seed',
+          seedChance: Math.random() * 100,
+          soil: 'ideal'
         });
         this.plantID++;
       }

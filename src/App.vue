@@ -3,6 +3,7 @@
 --------------------------------------------------------------------------------------------->
 <template>
 
+
  <div id="container" tabindex="0" 
       @keydown.87.exact="moveUp()"
       @keyup.87.exact="stopMoving()"
@@ -27,6 +28,8 @@
       @keyup.84="talkHere()"
      
       >
+
+
   <v-stage ref="stage" :config="{
         container: 'container',
         x: 10,
@@ -36,23 +39,16 @@
         }">
     <v-fastLayer>
 
-      <v-rect
+      <!-- <v-rect
         :config="{
             width: 2200,
             height: 2000,
             fill: 'black',
             stroke: '#8EA8C3'
           }"
-      ></v-rect>
+      ></v-rect> -->
 
-      <v-text
-        :config="{
-            x: 800,
-            y: 50,
-            fontSize:25,
-            text:'Harvest 6 ideal plants(yellow) to survive the winter.',
-            }"
-      />
+    
       <v-rect
         :config="{
             x: i.x,
@@ -65,10 +61,11 @@
         v-for="i in tileArray"
         :key="i.tileID"
       ></v-rect>
+
+      <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
     </v-fastLayer>
 
-      <!-- <Tile v-for="i in tileArray" :key="i.tileID" :Coordinates="i"></Tile> -->
-      <!-- <BoundaryTile></BoundaryTile> -->
+  
       <v-layer>
 
        <EnvironmentBanner></EnvironmentBanner> 
@@ -80,7 +77,7 @@
         <!-- <v-text :config="characterSpeech" /> -->
 
       <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
-      <waterTile v-for="i in waterArray" :key="i.tileID" :waterInfo="i"></waterTile>
+      
       <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
       <PlantTile ref="plant" v-for="i in plantArray" :key="i.id" :plantInfo="i" :plantArray="plantArray"
                  @growing="growing"></PlantTile>
@@ -109,6 +106,15 @@
             text: this.crops,
             }"
       />
+       <v-text
+        :config="{
+            x: 25,
+            y: 50,
+            fontSize:25,
+            stroke: 'black',
+            text: this.max,
+            }"
+      />
 
        <v-text
         :config="{
@@ -119,8 +125,30 @@
             text: this.seeds,
             }"
       />
+       <v-text
+        :config="{
+            x: 50,
+            y: 110,
+            fontSize:25,
+            stroke: 'pink',
+            text: this.counter,
+            }"
+      />
+       <v-text
+        :config="{
+            x: 300,
+            y: 500,
+            fontSize:50,
+            stroke: 'Black',
+            text: this.lose,
+            }"
+      />
 
       <!--                                  PLAYER COMPONENT                                    -->
+                          <!-- BOTTOM OF PLAYER COMPONENT -->
+
+    </v-layer>
+    <v-fastLayer>
       <Player
         ref="player" 
         :HomeInfo="HomeArray[0]"
@@ -141,9 +169,7 @@
         @playerLocation="set"
         @feedFire="feedFire"
       ></Player>
-                          <!-- BOTTOM OF PLAYER COMPONENT -->
-
-    </v-layer>
+    </v-fastLayer>
   </v-stage>
 
   </div>
@@ -151,8 +177,8 @@
 
 
 <script>
-//  ******************************************************************************************************************************
-//                                                   SCRIPT
+// *******************************************************************************************************************************
+//                                                    SCRIPT
 // *******************************************************************************************************************************
 
 
@@ -207,17 +233,23 @@ export default {
       stepArray: [],
       hoeArray: [],
 
-      fireLife: '////////////////////',
+      fireLife: '//////////////',
       fireColor: 'orange',
       crops:'////////////////////',
-      burnRate: 2500,
-
+      max:'/                  /',
       seeds:'//',
+      lose:'',
+
+      stage1Fire: 'blue',
+      stage2Fire: '#FF5A1E',
+      stage3Fire: 'red',
+      burnRate: 2000,
+
 
       moving: true,
-      speed: 10,
+      speed: 100,
 
-        // ****************************                 dCHARACTER DATA
+        // ****************************                    CHARACTER DATA
       CharacterInfo: {
         x: 200,
         y: 520,
@@ -240,6 +272,8 @@ export default {
       interval: null,
       dayInterval: null,
       outside: true,
+      start: null,
+      counter: 0,
 
 
       tileObj: { x: 100, y: 100, tileID: 0 },
@@ -251,12 +285,14 @@ export default {
 // *******************************************************************************************************************************
 
   mounted() {  // -----------------                   MOUNTED 
+    this.start = Date.now()
     this.dayInterval = setInterval(() => {
-      console.log("hoieoheo")
       this.$refs.plant.forEach(element => {
         element.growPlant();
+        this.counter = Math.floor((Date.now() - this.start) / 1000);
       });
-    }, 10000);
+    }, 1000);
+
     this.startFire();
 
     this.generateGrid();
@@ -276,13 +312,13 @@ export default {
   methods: { 
     moveUp(){
 
-      if(this.moving){
+       if(this.moving && this.fireLife.length != 0){
         this.moving = false;                
         this.$refs.player.moveUp();
         // this.interval = setInterval(() => {
         //   this.$refs.player.moveUp();
         // }, this.speed);
-          // this.$refs.player.moveUp();
+        // this.$refs.player.moveUp();
         setTimeout(() => {
           this.moving = true;
         }, this.speed);
@@ -290,11 +326,11 @@ export default {
       }
     },
     stopMoving(){
-      // this.moving = true;
-      // clearInterval(this.interval)
+    
     },
     moveDown(){
-      if(this.moving){
+
+      if(this.moving  && this.fireLife.length != 0){
         this.moving = false;
           this.$refs.player.moveDown();
     //     this.interval = setInterval(() => {
@@ -308,7 +344,7 @@ export default {
       }
     },
     moveLeft(){
-       if(this.moving){
+        if(this.moving  && this.fireLife.length != 0){
         this.moving = false;
         this.$refs.player.moveLeft();
     //     this.interval = setInterval(() => {
@@ -321,7 +357,8 @@ export default {
       }
     },
     moveRight(){
-       if(this.moving){
+
+       if(this.moving && this.fireLife.length != 0){
         this.moving = false;
         this.$refs.player.moveRight();
     //     this.interval = setInterval(() => {
@@ -356,8 +393,6 @@ export default {
       }
       else{
         this.$refs.player.plant();
-        console.log("plant REF:", this.$refs);
-        // this.seeds = this.seeds.substring(0, this.seeds.length - 1);
       }
     },
 
@@ -368,7 +403,13 @@ export default {
       this.$refs.player.talk();
     },
     harvestHere(){
-      this.$refs.player.harvest();
+      if(this.crops.length >= 20){
+        return null;
+      }
+      else{
+
+        this.$refs.player.harvest();
+      }
     },
 
     playerFeedFire(){
@@ -473,6 +514,11 @@ export default {
         }
         xSpace += 20;
       }
+
+      this.boundariesArray.push({
+        x: this.HomeArray[0].x,
+        y: this.HomeArray[0].y
+      })
     },
 
     generateSteps() {
@@ -513,27 +559,92 @@ export default {
 
     plantGenerator(){
 
-      var id = 0;
-      var i = 20;
-      var j = 20;
-      var ySpace = 160;
 
-      for (j = 5; j > 0; j--) {
-        var xSpace = Math.floor((Math.random() * 100)) * 20;
-        console.log('Xxxxx', xSpace)
+      // var i = 20;
+      // var j = 20;
+      // var ySpace = 160;
 
-        for (i = 15; i > 0; i--) {
-          this.plantArray.push({
+      // for (j = 5; j > 0; j--) {
+      //   var xSpace = Math.floor((Math.random() * 100)) * 20;
+      //   console.log('Xxxxx', xSpace)
+
+      //   for (i = 15; i > 0; i--) {
+      //     this.plantArray.push({
+      //       x: xSpace,
+      //       y: ySpace,
+      //       seedChance: Math.random() * 100,
+      //       id: "genPlant#:" + id
+      //     });
+      //         xSpace = Math.floor((Math.random() * 100)) * 20;;
+      //         id++;
+      // }
+      //      ySpace = Math.floor((Math.random() * 100)) * 20;;
+      // }
+
+      var id = 0
+      var i = 0
+      var xSpace = 0
+      var ySpace = 0
+
+      for(i = 5; i > 0; i--){
+         xSpace = (Math.floor( (Math.random() * 10)) * 20) + 40
+         ySpace = (Math.floor( (Math.random() * 10)) * 20) + 200
+         id ++
+         this.plantArray.push({
             x: xSpace,
             y: ySpace,
             seedChance: Math.random() * 100,
             id: "genPlant#:" + id
           });
-               xSpace = Math.floor((Math.random() * 100)) * 20;;
-              id++;
       }
-           ySpace = Math.floor((Math.random() * 100)) * 20;;
+      for(i = 5; i > 0; i--){
+         xSpace = (Math.floor( (Math.random() * 10)) * 20) + 40
+         ySpace = (Math.floor( (Math.random() * 10)) * 20) + 500
+         id ++
+         this.plantArray.push({
+            x: xSpace,
+            y: ySpace,
+            seedChance: Math.random() * 100,
+            id: "genPlant#:" + id
+          });
       }
+      for(i = 5; i > 0; i--){
+         xSpace = (Math.floor( (Math.random() * 10)) * 20) + 300
+         ySpace = (Math.floor( (Math.random() * 14)) * 20) + 500
+         id ++
+         this.plantArray.push({
+            x: xSpace,
+            y: ySpace,
+            seedChance: Math.random() * 100,
+            id: "genPlant#:" + id
+          });
+      }
+      for(i = 5; i > 0; i--){
+         xSpace = (Math.floor( (Math.random() * 10)) * 20) + 700
+         ySpace = (Math.floor( (Math.random() * 10)) * 20) + 200
+         id ++
+         this.plantArray.push({
+            x: xSpace,
+            y: ySpace,
+            seedChance: Math.random() * 100,
+            id: "genPlant#:" + id
+          });
+      }
+      for(i = 5; i > 0; i--){
+         xSpace = (Math.floor( (Math.random() * 10)) * 20) + 700
+         ySpace = (Math.floor( (Math.random() * 10)) * 20) + 500
+         id ++
+         this.plantArray.push({
+            x: xSpace,
+            y: ySpace,
+            seedChance: Math.random() * 100,
+            id: "genPlant#:" + id
+          });
+      }
+
+      console.log("Plant Generation:", this.plantArray)
+
+
     },
 
     itemsGenerator(){
@@ -550,7 +661,7 @@ export default {
 
     // Initiated when player emits plantHere
     plant(obj) {
-              this.seeds = this.seeds.substring(0, this.seeds.length - 1);
+      this.seeds = this.seeds.substring(0, this.seeds.length - 1);
       console.log("Planted", obj);
 
       this.plantArray.push(obj);
@@ -620,13 +731,27 @@ d
 
           this.interval = setInterval(() => {
     
-          if (this.fireLife.length == 4){
+          if (this.fireLife.length == 24){
+            this.$refs.player.player.fill = '#FF5A1E'
+            this.fireColor = '#FF5A1E';
+            this.speed = 100;
+            this.burnRate = 2500;
+            clearInterval(this.interval);
+            this.startFire();
+          }
+          if (this.fireLife.length == 8){
             this.$refs.player.player.fill = 'blue'
             this.fireColor = 'blue';
-            this.speed = 200
+            this.speed = 200;
             this.burnRate = 3000;
             clearInterval(this.interval);
             this.startFire();
+          }
+          if (this.fireLife.length <= 1){
+            this.$refs.player.player.fill = 'black';
+            this.lose = "You are Dead"
+            clearInterval(this.dayInterval);
+            clearInterval(this.interval);
           }
         this.fireLife = this.fireLife.substring(0, this.fireLife.length - 1);
         }, this.burnRate);
@@ -636,11 +761,20 @@ d
       this.fireLife = this.fireLife + this.crops
       this.crops = '';
 
-      if(this.fireLife.length >= 5){
+      if(this.fireLife.length >= 25){
         this.$refs.player.player.fill = '#EF4700'
-        this.fireColor = 'orange';
+        this.fireColor = '#EF4700';
+        this.burnRate = 1000;
+        this.speed = 50;
+        clearInterval(this.interval);
+        this.startFire();
+      }
+
+      else if(this.fireLife.length >= 9){
+        this.$refs.player.player.fill = '#FF5A1E'
+        this.fireColor = '#FF5A1E';
         this.burnRate = 2500;
-        this.speed = 5;
+        this.speed = 100;
         clearInterval(this.interval);
         this.startFire();
       }

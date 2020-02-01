@@ -46,14 +46,7 @@ export default {
     console.log("PlantTile Mounted");
     console.log("maturity:", this.maturity);
 
-    // this.interval = setInterval(() => {
-    //   this.growPlant();
-    // }, 10000);
 
-  },
-
-  beforeDestroy() {
-    clearInterval(this.interval);
   },
 
   methods: {
@@ -62,7 +55,7 @@ export default {
       this.count += 1;
 
       switch(this.count){
-        case 3:
+        case 30:
           this.plant.stroke = "green";
 
           this.$emit("growing", {
@@ -71,7 +64,7 @@ export default {
         });
           break;
           
-        case 10:
+        case 100:
           this.plant.fontSize = 30;
 
            this.$emit("growing", {
@@ -79,16 +72,25 @@ export default {
           maturity: 'mature'
         });
           break;
-        case 25:
-          this.plant.stroke = "yellow"
+        case 250:
 
-          this.$emit("growing", {
-          id: this.plantInfo.id,
-          maturity: 'ideal'
-        });
+          if(this.plantInfo.soil == 'ideal'){
+            this.plant.stroke = "yellow"
+            this.$emit("growing", {
+              id: this.plantInfo.id,
+              maturity: 'ideal'
+           });
+          }
+          else {
+            this.plant.stroke = "black";
+            this.plant.fontSize = 10;
+            this.plant.text = "X";
+            this.$emit("growing", {
+              id: this.plantInfo.id,
+              maturity: 'dead'
+          });}
           break;
-        case 29:
-
+        case 290:
           this.plant.stroke = "black";
           this.plant.fontSize = 10;
           this.plant.text = "X";
@@ -96,7 +98,7 @@ export default {
           id: this.plantInfo.id,
           maturity: 'dead'
         });
-          clearInterval(this.interval);
+
           break;
       }
     }

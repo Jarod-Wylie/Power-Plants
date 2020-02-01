@@ -2,20 +2,7 @@
 
 <template>
   <div>
-    <v-group>
     <v-rect :config="square"></v-rect>
-    <!-- <v-rect :config="rect1"></v-rect>
-    <v-rect :config="rect2"></v-rect>
-    <v-rect :config="rect3"></v-rect>
-    <v-rect :config="rect4"></v-rect> -->
-    </v-group>
-    <!-- <v-image :config="{
-        image: image,
-        x: this.stepInfo.x,
-        y: this.stepInfo.y,
-        height: 20rect
-        width: 20,
-      }"/> -->
   </div>
 </template>
 
