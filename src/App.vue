@@ -168,6 +168,7 @@
         @pickUpItem="pickUpItem"
         @playerLocation="set"
         @feedFire="feedFire"
+        @putDown="putDown"
       ></Player>
     </v-fastLayer>
   </v-stage>
@@ -234,7 +235,7 @@ export default {
       hoeArray: [],
 
       fireLife: '//////////////',
-      fireColor: 'orange',
+      fireColor: '#FF5A1E',
       crops:'////////////////////',
       max:'/                  /',
       seeds:'//',
@@ -385,6 +386,7 @@ export default {
       this.$refs.player.buildR();
     },
     grab(){
+
       this.$refs.player.grab();
     },
     plantHere(){
@@ -686,6 +688,15 @@ d
       console.log("Hoe Array:", this.hoeArray);
     },
 
+    putDown(obj){
+      // obj.x = this.$refs.player.player.x
+      // obj.y = this.$refs.player.player.y
+      //  this.hoeArray = this.hoeArray.filter(hoe => hoe.id == obj.id);
+      console.log(obj)
+      this.hoeArray.push(obj);
+
+    },
+
     growing(obj){
       
       // console.log('plantArray:', obj)
@@ -758,6 +769,8 @@ d
     },
 
     feedFire(){
+      if(this.fireLife.length != 0){
+
       this.fireLife = this.fireLife + this.crops
       this.crops = '';
 
@@ -777,6 +790,7 @@ d
         this.speed = 100;
         clearInterval(this.interval);
         this.startFire();
+      }
       }
 
     },

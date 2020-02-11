@@ -484,6 +484,16 @@ grab(){
   if (itemFound){
     this.$emit('pickUpItem', {itemFound})
   }
+  else if (!itemFound){
+    console.log(this.inventoryArray)
+    var inventoryFound = (inventoryFound = this.inventoryArray.find(
+      item => (item.type == 'hoe')
+    ))
+    console.log("inve:" ,inventoryFound)
+    this.$emit("putDown", {
+      inventoryFound
+    })
+  }
 },
 
 // ****************************                   AGRICULTURE METHODS
