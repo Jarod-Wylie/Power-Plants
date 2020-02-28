@@ -81,24 +81,28 @@ export default {
   },
 
   created(){
-      var imageObj = new window.Image();
-     imageObj.src = require("./assets/fire.png");
-    //  imageObj.src = require(this.animations[0]);
-    // image.src = "https://konvajs.org/assets/yoda.jpg";
+    var imageObj = new window.Image();
+    imageObj.src = require("./assets/fire.png");
     console.log(imageObj) 
     imageObj.onload = () => {
-
-      // set image only when it is loaded
-      this.imageObj = imageObj;
+    // set image only when it is loaded
+    this.imageObj = imageObj;
     }
 },
 
   mounted() {
     console.log("HomeTile Mounted:", this.imageObj);
-
-     const node = this.$refs.sprite.getNode();
-
-        node.start();   
+    var node = this.$refs.sprite.getNode();
+    node.start();   
   },
+
+  methods:{
+    stopFireAnimation(){
+    const node = this.$refs.sprite.getNode();
+    node.stop();   
+      
+    }
+    }
+
 };
 </script>

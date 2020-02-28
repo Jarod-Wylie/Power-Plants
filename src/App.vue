@@ -5,14 +5,13 @@
 
 
  <div id="container" tabindex="0" 
+
+      @keydown.space="pauseGame()"
       @keydown.87.exact="moveUp()"
-      @keyup.87.exact="stopMoving()"
-      @keydown.83.exact="moveDown()" 
-      @keyup.83.exact="stopMoving()" 
+      @keydown.83.exact="moveDown()"  
       @keydown.65.exact="moveLeft()"
-      @keyup.65.exact="stopMoving()"
       @keydown.68.exact="moveRight()" 
-      @keyup.68.exact="stopMoving()"
+
       @keydown.74.exact="playerFeedFire()" 
 
 
@@ -76,7 +75,7 @@
         <!-- <Character :CharacterInfo="CharacterInfo"></Character> -->
         <!-- <v-text :config="characterSpeech" /> -->
 
-      <HomeTile :HomeInfo="HomeArray[0]"></HomeTile>
+      <HomeTile ref="HomeTile" :HomeInfo="HomeArray[0]"></HomeTile>
       
       <irrigationTile v-for="i in irrigationArray" :key="i.tileID" :irrigationInfo="i"></irrigationTile>
       <PlantTile ref="plant" v-for="i in plantArray" :key="i.id" :plantInfo="i" :plantArray="plantArray"
@@ -141,6 +140,15 @@
             fontSize:50,
             stroke: 'Black',
             text: this.lose,
+            }"
+      />
+       <v-text
+        :config="{
+            x: 300,
+            y: 500,
+            fontSize:200,
+            stroke: 'Blue',
+            text: this.pauseMessage,
             }"
       />
 
@@ -240,14 +248,16 @@ export default {
       max:'/                  /',
       seeds:'//',
       lose:'',
+      pauseMessage:'',
 
       stage1Fire: 'blue',
       stage2Fire: '#FF5A1E',
       stage3Fire: 'red',
       burnRate: 2000,
 
-
+      paused: false,
       moving: true,
+      canMove: true,
       speed: 100,
 
         // ****************************                    CHARACTER DATA
@@ -286,15 +296,6 @@ export default {
 // *******************************************************************************************************************************
 
   mounted() {  // -----------------                   MOUNTED 
-    this.start = Date.now()
-    this.dayInterval = setInterval(() => {
-      this.$refs.plant.forEach(element => {
-        element.growPlant();
-        this.counter = Math.floor((Date.now() - this.start) / 1000);
-      });
-    }, 1000);
-
-    this.startFire();
 
     this.generateGrid();
     this.generateBoundaries();
@@ -303,6 +304,9 @@ export default {
     this.plantGenerator();
     this.itemsGenerator();
 
+    this.start = Date.now()/1000
+    this.startDay();
+    this.startFire();
 
     
   },
@@ -312,31 +316,20 @@ export default {
 // *******************************************************************************************************************************
   methods: { 
     moveUp(){
-
-       if(this.moving && this.fireLife.length != 0){
+       if(this.moving && this.canMove){
         this.moving = false;                
         this.$refs.player.moveUp();
-        // this.interval = setInterval(() => {
-        //   this.$refs.player.moveUp();
-        // }, this.speed);
-        // this.$refs.player.moveUp();
         setTimeout(() => {
           this.moving = true;
         }, this.speed);
         console.log("player!!!!:", this.$refs.player)
       }
     },
-    stopMoving(){
-    
-    },
     moveDown(){
 
-      if(this.moving  && this.fireLife.length != 0){
+      if(this.moving  && this.canMove){
         this.moving = false;
           this.$refs.player.moveDown();
-    //     this.interval = setInterval(() => {
-    //       this.$refs.player.moveDown();
-    // }, this.speed);
          setTimeout(() => {
           this.moving = true;
         }, this.speed);
@@ -345,12 +338,9 @@ export default {
       }
     },
     moveLeft(){
-        if(this.moving  && this.fireLife.length != 0){
+        if(this.moving  && this.canMove){
         this.moving = false;
         this.$refs.player.moveLeft();
-    //     this.interval = setInterval(() => {
-    //       this.$refs.player.moveLeft();
-    // }, this.speed);
     setTimeout(() => {
           this.moving = true;
         }, this.speed);
@@ -359,12 +349,9 @@ export default {
     },
     moveRight(){
 
-       if(this.moving && this.fireLife.length != 0){
+       if(this.moving && this.canMove){
         this.moving = false;
         this.$refs.player.moveRight();
-    //     this.interval = setInterval(() => {
-    //       this.$refs.player.moveRight();
-    // }, this.speed);
     setTimeout(() => {
           this.moving = true;
         }, this.speed);
@@ -428,15 +415,12 @@ export default {
 
     generateGrid() { // -- Generates the basic perimeter and
       var id = 0;    //    basic colored ground tiles
-  
       var ySpace = 160;
       var xSpace = 0;
-
       this.Perimeter.yUp = ySpace;
       this.Perimeter.xLeft = xSpace;
       for (var j = 29; j > 0; j--) {
         xSpace = 0;
-
         for (var i = 55; i > 0; i--) {
           this.tileArray.push({ x: xSpace, y: ySpace, tileID: "grid#" + id, show: "O" });
           xSpace += 20;
@@ -454,7 +438,6 @@ export default {
       var j = 20;
       var xSpace = 100;
       var ySpace = 700;
-
       for (j = 40; j > 0; j--) {
         this.wallArray.push({
           x: xSpace,
@@ -467,14 +450,12 @@ export default {
           type: "wall",
           tileID: "boarder#:" + id
         });
-
         id++;
         xSpace += 20;
       }
       xSpace = 100;
       for (i = 6; i > 0; i--) {
         ySpace = 200;
-
         for (j = 5; j > 0; j--) {
           this.wallArray.push({
             x: xSpace,
@@ -486,19 +467,15 @@ export default {
             y: ySpace,
             tileID: "boarder#:" + id
           });
-
           id++;
           ySpace += 20;
         }
         xSpace += 20;
       }
-
       xSpace = 500
       ySpace = 100
-
       for (i = 6; i > 0; i--) {
         ySpace = 200;
-
         for (j = 5; j > 0; j--) {
           this.wallArray.push({
             x: xSpace,
@@ -516,7 +493,6 @@ export default {
         }
         xSpace += 20;
       }
-
       this.boundariesArray.push({
         x: this.HomeArray[0].x,
         y: this.HomeArray[0].y
@@ -530,7 +506,6 @@ export default {
       this.stepArray.push({ x: 660, y: 280, id:4 });
     },
 
-    //
     generateWater() {
       var id = 0;
       var i = 20;
@@ -560,29 +535,6 @@ export default {
     },
 
     plantGenerator(){
-
-
-      // var i = 20;
-      // var j = 20;
-      // var ySpace = 160;
-
-      // for (j = 5; j > 0; j--) {
-      //   var xSpace = Math.floor((Math.random() * 100)) * 20;
-      //   console.log('Xxxxx', xSpace)
-
-      //   for (i = 15; i > 0; i--) {
-      //     this.plantArray.push({
-      //       x: xSpace,
-      //       y: ySpace,
-      //       seedChance: Math.random() * 100,
-      //       id: "genPlant#:" + id
-      //     });
-      //         xSpace = Math.floor((Math.random() * 100)) * 20;;
-      //         id++;
-      // }
-      //      ySpace = Math.floor((Math.random() * 100)) * 20;;
-      // }
-
       var id = 0
       var i = 0
       var xSpace = 0
@@ -665,13 +617,8 @@ export default {
     plant(obj) {
       this.seeds = this.seeds.substring(0, this.seeds.length - 1);
       console.log("Planted", obj);
-
       this.plantArray.push(obj);
-d
       console.log("plant Array:", this.plantArray);
-      
-      
-
     },
 
     build(obj){
@@ -694,19 +641,14 @@ d
       //  this.hoeArray = this.hoeArray.filter(hoe => hoe.id == obj.id);
       console.log(obj)
       this.hoeArray.push(obj);
-
     },
 
     growing(obj){
-      
-      // console.log('plantArray:', obj)
       // console.log('plantArray:', obj)
       var plantGrowing = this.plantArray.findIndex( plant => obj.id == plant.id)
       console.log('Growing:', obj.maturity)
-
       this.plantArray[plantGrowing].maturity = obj.maturity
       this.plantArray[plantGrowing].seedChance = this.plantArray[plantGrowing].seedChance + 15
-
     },
 
    
@@ -715,17 +657,12 @@ d
     harvest(obj) {
       var newItem = this.plantArray.find(plant => plant.id == obj.id);
       this.plantArray = this.plantArray.filter(plant => plant.id != obj.id);
-
-
-
        if (newItem.seedChance >= 102){
         this.seeds = this.seeds + '///';
-      }
+       }
       else if (newItem.seedChance >= 75){
         this.seeds = this.seeds + '/';
       }
-
-
       if (newItem.maturity == 'seedling'){
         this.crops = this.crops + '/';
       }
@@ -738,42 +675,67 @@ d
       
     },
 
-    startFire(){
+     pauseGame(){
+      if(!this.paused){
+        this.pauseMessage = "PAUSED"
+        clearInterval(this.interval)
+        clearInterval(this.dayInterval)
+        // this.$refs.HomeTile.stopFireAnimation;
+        this.paused = true;
+        this.canMove = false;
+      }
+      else {
+        this.start = (Date.now()/1000) - this.counter;
+        this.startDay();
+        this.startFire();
+        this.paused = false;
+        this.canMove = true;
+        this.pauseMessage = ''
+      }
+    },
 
-          this.interval = setInterval(() => {
-    
-          if (this.fireLife.length == 24){
-            this.$refs.player.player.fill = '#FF5A1E'
-            this.fireColor = '#FF5A1E';
-            this.speed = 100;
-            this.burnRate = 2500;
-            clearInterval(this.interval);
-            this.startFire();
-          }
-          if (this.fireLife.length == 8){
-            this.$refs.player.player.fill = 'blue'
-            this.fireColor = 'blue';
-            this.speed = 200;
-            this.burnRate = 3000;
-            clearInterval(this.interval);
-            this.startFire();
-          }
-          if (this.fireLife.length <= 1){
-            this.$refs.player.player.fill = 'black';
-            this.lose = "You are Dead"
-            clearInterval(this.dayInterval);
-            clearInterval(this.interval);
-          }
-        this.fireLife = this.fireLife.substring(0, this.fireLife.length - 1);
-        }, this.burnRate);
+    startDay(){
+      this.dayInterval = setInterval(() => {
+      this.$refs.plant.forEach(element => {
+        element.growPlant();
+        this.counter = Math.floor((Date.now()/1000) - this.start);
+      });
+    }, 1000);
+    },
+
+    startFire(){
+      this.interval = setInterval(() => {
+      if (this.fireLife.length == 24){
+        this.$refs.player.player.fill = '#FF5A1E'
+        this.fireColor = '#FF5A1E';
+        this.speed = 100;
+        this.burnRate = 2500;
+        clearInterval(this.interval);
+        this.startFire();
+      }
+      if (this.fireLife.length == 8){
+        this.$refs.player.player.fill = 'blue'
+        this.fireColor = 'blue';
+        this.speed = 200;
+        this.burnRate = 3000;
+        clearInterval(this.interval);
+        this.startFire();
+      }
+      if (this.fireLife.length <= 1){
+        this.$refs.player.player.fill = 'black';
+        this.lose = "You are Dead"
+        this.canMove = false;
+        clearInterval(this.dayInterval);
+        clearInterval(this.interval);
+      }
+    this.fireLife = this.fireLife.substring(0, this.fireLife.length - 1);
+    }, this.burnRate);
     },
 
     feedFire(){
       if(this.fireLife.length != 0){
-
       this.fireLife = this.fireLife + this.crops
       this.crops = '';
-
       if(this.fireLife.length >= 25){
         this.$refs.player.player.fill = '#EF4700'
         this.fireColor = '#EF4700';
@@ -782,7 +744,6 @@ d
         clearInterval(this.interval);
         this.startFire();
       }
-
       else if(this.fireLife.length >= 9){
         this.$refs.player.player.fill = '#FF5A1E'
         this.fireColor = '#FF5A1E';
