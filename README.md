@@ -3,6 +3,13 @@
 ## Game Play Instructions
 
 ### Controls
+W: Move Up
+A: Move Left
+S: Move Down
+D: Move Right
+
+H: Harvest plants for firewood and seeds
+P: Plant seeds to grow more plants
 
 
 ## Project setup
