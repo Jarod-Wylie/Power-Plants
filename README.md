@@ -12,16 +12,15 @@ This game is built in the spirit of a RougeLike so try to embrace losing early a
 ### Controls
 |Key|Action|
 |--|--|
-W: Move Up
-A: Move Left
-S: Move Down
-D: Move Right
-
-H: Harvest plants for firewood and seeds
-P: Plant seeds to grow more plants
-J: Spend wood to feed fire (must be standing on a tile directly next to the fire)
-G: Pick up tools(only tool in game is Hoe)
-I: Dig an irrigation canal (must be standing on a tile directly next to water or existing canal) -- you will need to be holding the Hoe to be able to do this.
+W | Move Up
+A | Move Left
+S | Move Down
+D | Move Right
+H | Harvest plants for firewood and seeds
+P | Plant seeds to grow more plants
+J | Spend wood to feed fire (must be standing on a tile directly next to the fire)
+G | Pick up tools(only tool in game is Hoe)
+I | Dig an irrigation canal (must be standing on a tile directly next to water or existing canal) -- you will need to be holding the Hoe to be able to do this.
 
 ### Other Notes and Tips
 Planting Rules:
