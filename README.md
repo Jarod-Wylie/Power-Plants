@@ -1,4 +1,4 @@
-# myapp
+# Power Plants
 
 ## Project setup
 ```
