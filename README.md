@@ -10,6 +10,7 @@ There is a timer to help you keep track of how long you can last on each attempt
 This game is built in the spirit of a RougeLike so try to embrace losing early and trying to learn the rules to growing the plants on your own. If you get too frustrated check the Other Notes and Tips in this Readme for spoilers.
 
 ### Controls
+|Key|Action|
 W: Move Up
 A: Move Left
 S: Move Down
@@ -23,8 +24,17 @@ I: Dig an irrigation canal (must be standing on a tile directly next to water or
 
 ### Other Notes and Tips
 Planting Rules:
-- A plant must be planted a full square a part from another plant unless the plant is beside water
-- A plant will not reach its ideal growth stage if it is planted directly next to the lake. Planting must be at least a square away from the lake to be able to reach its ideal growth stage
+- A plant must be planted a full square a part from another plant unless the plant is beside water. 
+- A plant will not reach its ideal growth stage if it is planted directly next to the lake. Planting must be at least a square away from the lake to be able to reach its ideal growth stage.
+
+Tip: It is to the player's advantage to dig irrigation canals to plant closer to the fire and plant in the ideal conditions for the plants.
+
+Plant Growth Stages:
+There are 4 potential stages of growth with each stage progressing in wood and seed yield until it progresses to the 'Dead' stage(this will produce seeds only).
+- Seedling
+- Mature
+- Ideal
+- Dead
 
 ## Project setup
 ```
