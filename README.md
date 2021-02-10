@@ -1,5 +1,10 @@
 # Power Plants
 
+## Game Play Instructions
+
+### Controls
+
+
 ## Project setup
 ```
 npm install
