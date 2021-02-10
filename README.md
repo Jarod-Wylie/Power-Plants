@@ -11,6 +11,7 @@ This game is built in the spirit of a RougeLike so try to embrace losing early a
 
 ### Controls
 |Key|Action|
+|--|--|
 W: Move Up
 A: Move Left
 S: Move Down
